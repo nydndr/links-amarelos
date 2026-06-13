@@ -11,6 +11,9 @@
     --color-foreground: var(--foreground);
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
+    --font-manrope: var(--font-manrope);
+    --font-unbounded: var(--font-unbounded);
+    --font-space-mono: var(--font-space-mono);
 }
 
 body {
