@@ -1,39 +1,44 @@
+import LinksLogotype from "./components/icons/LinksLogotype";
+import OndasLogotype from "./components/icons/OndasLogotype";
+
 export default function Home() {
   return (
-    <main className="border-x border-(--amarelo) min-h-screen bg-(--amarelo) max-w-2/3 mx-auto">
-      <section className="grid grid-cols-3 border-b border-amber-200 divide-x divide-amber-200 items-end">
-        <div className="p-4 space-y-2 pt-24 col-span-2">
-          <h1 className="text-white font-bold text-lg">
-            links amarelos + ondas amarelas
-          </h1>
-          <div></div>
-          <p>
-            Uma curadoria sem limites com o creme de la creme da vadiagem
-            digital. Recomendações de textos, livros, documentários e coisas
-            ainda sem taxonomia digital vigente.
-          </p>
-          <p>
-            E as ondas amarelas, a versão expandida dessas conversas agora em
-            áudio.
+    <main className="min-h-screen bg-(--amarelo) max-w-2/3 mx-auto">
+      <section className="grid grid-cols-5 border-b border-amber-200 divide-x divide-amber-200 items-end">
+        <div className="p-4 pt-40 col-span-3 ">
+          <div className="flex items-center gap-2">
+            <LinksLogotype className="w-40"></LinksLogotype>
+            <p>+</p>
+            <OndasLogotype className="w-48"></OndasLogotype>
+          </div>
+
+          <p className="font-manrope text-lg w-11/12">
+            Uma curadoria sem limites, o creme de la creme da vadiagem digital.
+            Textos, livros, documentários e coisas ainda sem taxonomia digital
+            vigente.
           </p>
         </div>
-        <div className="pt-24">
-          <p className="uppercase text-sm text-amber-100 px-4">
+        <div className="col-span-2">
+          <p className="uppercase text-sm text-amber-100 p-4 font-unbounded">
             Comece por aqui
           </p>
 
-          <div className=" text-white">
+          <div className="">
             <div className="border-amber-200 border-t flex items-center gap-4 hover:bg-blue-600">
-              <div className="size-20 bg-blue-200 rotate-6"></div>
+              <div className="size-20 aspect-square bg-blue-200 rotate-6"></div>
 
-              <div className="">
+              <div className="w-full mr-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-lg">links amarelos #?</p>
-                  <p className="bg-amber-200/50 px-3 lowercase rounded-full">
+                  <p className="font-manrope font-bold tracking-tight">
+                    links amarelos #3
+                  </p>
+                  <p className="lowercase flex rounded-full text-xs font-space-mono px-2 py-1 bg-stone-400/10 border border-green-400/50  text-green-800">
                     Leia
                   </p>
                 </div>
-                <p>Descrição</p>
+                <p className="font-manrope text-sm">
+                  maestros, saltos e seriedade
+                </p>
               </div>
             </div>
 
@@ -53,7 +58,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="flex gap-4 py-6 px-4">
+      {/* <section className="flex gap-4 py-6 px-4">
         <p className="uppercase text-white whitespace-nowrap">
           ▲ Site em construção ▲
         </p>
@@ -112,7 +117,7 @@ export default function Home() {
             mundo de amarelo e muito mais...
           </p>
         </div>
-      </section>
+      </section>*/}
     </main>
   );
 }
