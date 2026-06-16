@@ -1,38 +1,40 @@
-import LinksLogotype from "./components/icons/LinksLogotype";
-import OndasLogotype from "./components/icons/OndasLogotype";
+import Image from "next/image";
+import AutoTooltips from "./components/AutoTooltips";
+import LogoCarousel from "./components/LogoCarousel";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-(--amarelo) max-w-2/3 mx-auto">
+    <main className="min-h-screen bg-(--amarelo) w-full md:max-w-4xl md:mx-auto">
       <section className="grid grid-cols-5 border-b border-amber-200 divide-x divide-amber-200 items-end">
-        <div className="p-4 pt-40 col-span-3 ">
-          <div className="flex items-center gap-2">
-            <LinksLogotype className="w-40"></LinksLogotype>
-            <p>+</p>
-            <OndasLogotype className="w-48"></OndasLogotype>
+        <div className="p-4 h-80 flex flex-col justify-between col-span-3 space-y-4">
+          <div className="text-amber-200">
+            <LogoCarousel />
           </div>
 
-          <p className="font-manrope text-lg w-11/12">
-            Uma curadoria sem limites, o creme de la creme da vadiagem digital.
-            Textos, livros, documentários e coisas ainda sem taxonomia digital
-            vigente.
-          </p>
+          <AutoTooltips />
         </div>
+
         <div className="col-span-2">
-          <p className="uppercase text-sm text-amber-100 p-4 font-unbounded">
+          <p className="uppercase text-sm text-amber-100 px-4 py-2 font-unbounded">
             Comece por aqui
           </p>
 
-          <div className="">
-            <div className="border-amber-200 border-t flex items-center gap-4 hover:bg-blue-600">
-              <div className="size-20 aspect-square bg-blue-200 rotate-6"></div>
+          <div className="text-amber-100">
+            <div className="border-amber-200 border-t flex items-center gap-4 hover:bg-blue-600 group py-3">
+              <Image
+                src="/brand/links-amarelos-3.png"
+                width={2000}
+                height={2000}
+                className="size-24 aspect-square rotate-6 -my-3 shrink-0 outline outline-2 outline-amber-200 transition-transform duration-200 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110 group-hover:-translate-y-1"
+                alt="links amarelos #3"
+              />
 
               <div className="w-full mr-3">
                 <div className="flex items-center justify-between">
                   <p className="font-manrope font-bold tracking-tight">
                     links amarelos #3
                   </p>
-                  <p className="lowercase flex rounded-full text-xs font-space-mono px-2 py-1 bg-stone-400/10 border border-green-400/50  text-green-800">
+                  <p className="lowercase flex rounded-full text-xs font-space-mono px-2 py-0.5 bg-white/10 border border-white/50  text-white">
                     Leia
                   </p>
                 </div>
@@ -42,22 +44,41 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="border-amber-200 border-t flex items-center gap-4 hover:bg-blue-600">
-              <div className="size-20 bg-blue-200 rotate-6"></div>
-
-              <div className="">
+            <div className="border-amber-200 border-t flex items-center gap-4 hover:bg-blue-600 group py-3">
+              <Image
+                src="/brand/ondas-amarelas-6.png"
+                width={2000}
+                height={2000}
+                className="size-24 aspect-square -rotate-3 -my-3 shrink-0 outline outline-2 outline-amber-200 transition-transform duration-200 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110 group-hover:-translate-y-1"
+                alt="ondas amarelas #6"
+              />
+              <div className="w-full mr-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-lg">ondas amarelas #8</p>
-                  <p className="bg-amber-200/50 px-3 lowercase rounded-full">
+                  <p className="font-manrope font-bold tracking-tight">
+                    ondas amarelas #6
+                  </p>
+                  <p className="lowercase flex rounded-full text-xs font-space-mono px-2 py-0.5 bg-white/10 border border-white/50  text-white">
                     Ouça
                   </p>
                 </div>
-                <p>Descrição</p>
+                <p className="font-manrope text-sm">
+                  autorrealização, autocriação
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* <section>
+        <p className="text-center  font-manrope w-2/3 mx-auto">
+          Em tempos ideais, eu Amarelo Dandara, me sento com um lanchinho
+          gostoso em mãos e passo horas em vadiagem digital. no final, eu me
+          levanto com o bolso cheio de artigos, livros, filmes, músicas e outras
+          coisas fora da taxonomia digital vigente. os links amarelos são o
+          *creme de la creme dessa vadiagem*, aprecie
+        </p>
+      </section>*/}
       {/* <section className="flex gap-4 py-6 px-4">
         <p className="uppercase text-white whitespace-nowrap">
           ▲ Site em construção ▲
