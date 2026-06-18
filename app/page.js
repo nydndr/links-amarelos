@@ -1,6 +1,7 @@
 import Image from "next/image";
 import AutoTooltips from "./components/AutoTooltips";
 import LogoCarousel from "./components/LogoCarousel";
+import CurationAnimation from "./components/CurationAnimation";
 
 export default function Home() {
   return (
@@ -69,6 +70,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <CurationAnimation />
 
       {/* <section>
         <p className="text-center  font-manrope w-2/3 mx-auto">
