@@ -29,6 +29,7 @@ export default function CurationAnimation() {
         minHeight: "32rem",
         background: defaultConfig.bgColor,
       }}
+      className="border-x border-(--amarelo)"
     >
       <CurationCanvas
         configRef={configRef}
