@@ -1,0 +1,17 @@
+<svg
+    width="48"
+    height="48"
+    viewBox="0 0 48 48"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+>
+    <rect width="48" height="48" fill="#fafafa" opacity="0" />
+    <g opacity="0.15">
+        <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M24 19H23V23H19V24H23V28H24V24H28V23H24V19Z"
+            fill="#7c5bbe"
+        ></path>
+    </g>
+</svg>

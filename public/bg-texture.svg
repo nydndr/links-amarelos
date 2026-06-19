@@ -6,6 +6,14 @@
     fill="none"
 >
     <rect width="48" height="48" fill="#fafafa" opacity="0" />
+    <g opacity="0.15">
+        <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M24 19H23V23H19V24H23V28H24V24H28V23H24V19Z"
+            fill="#ffcc00"
+        ></path>
+    </g>
     <g opacity="0.05">
         <g clip-path="url(#clip0_83_48037)">
             <path
@@ -30,11 +38,5 @@
                 <rect width="48" height="48" fill="white"></rect>
             </clipPath>
         </defs>
-    </g>
-    <g opacity="0.3">
-        <path
-            d="M24 34H23V25H24V34ZM34 23V24H25V23H34ZM22 24H13V23H22V24ZM24 22H23V13H24V22Z"
-            fill="#ffcc00"
-        ></path>
     </g>
 </svg>
