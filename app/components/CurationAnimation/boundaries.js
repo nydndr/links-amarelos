@@ -59,6 +59,42 @@ export function drawOrganicBoundary(ctx, points, progress, hexColor) {
   ctx.restore();
 }
 
+export function drawStraightBoundary(ctx, rect, progress, hexColor) {
+  if (!rect || progress <= 0) return;
+  const { x, y, w, h } = rect;
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+
+  ctx.save();
+  ctx.strokeStyle = `rgba(${r},${g},${b},0.9)`;
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'square';
+
+  const sides = [
+    [x,     y,     x + w, y    ],
+    [x + w, y,     x + w, y + h],
+    [x + w, y + h, x,     y + h],
+    [x,     y + h, x,     y    ],
+  ];
+  const perimeter = 2 * (w + h);
+  let remaining = progress * perimeter;
+
+  for (const [x1, y1, x2, y2] of sides) {
+    if (remaining <= 0) break;
+    const len = Math.hypot(x2 - x1, y2 - y1);
+    const seg = Math.min(len, remaining);
+    const t = seg / len;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t);
+    ctx.stroke();
+    remaining -= len;
+  }
+
+  ctx.restore();
+}
+
 export function drawRigidBoundary(ctx, rect, progress, hexColor) {
   if (!rect || progress <= 0) return;
   const { x, y, w, h } = rect;

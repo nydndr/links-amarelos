@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { spawnParticles, createNoisePattern } from './particles';
 import { Trail } from './trail';
 import { Cursor, buildCursorPath } from './cursor';
-import { generateOrganicPoints, drawOrganicBoundary, drawRigidBoundary } from './boundaries';
+import { generateOrganicPoints, drawOrganicBoundary } from './boundaries';
 import { defaultConfig } from './config';
 
 // ---- zone helpers ----
@@ -41,8 +41,6 @@ function createInitialState(w, h, config) {
     cursor: new Cursor(),
     organicBoundaryPoints: null,
     organicBoundaryProgress: 0,
-    rigidBoundaryRects: null,
-    rigidBoundaryProgress: 0,
     logoOpacity: { linksAmarelos: 0, ondasAmarelas: 0, hyperlinks: 0 },
     noisePattern: null,
     axis,
@@ -84,6 +82,8 @@ function enterStage(state, newStage, config) {
 
   if (newStage === 2) {
     cursor.exit();
+    // Guarantee exactly targetClickCount yellow — click any the cursor missed
+    particles.filter(p => p.willBeClicked && !p.clicked).forEach(p => p.triggerClick());
     const { width, height } = state;
     const cx = width / 2;
     const cy = height / 2;
@@ -115,50 +115,33 @@ function enterStage(state, newStage, config) {
 
   if (newStage === 4) {
     const outer = particles.filter(p => p.colorState === 'yellow' && p.zone === 'outer');
-    const chosen = outer.sort(() => Math.random() - 0.5).slice(0, 10);
+    const chosen = outer.sort(() => Math.random() - 0.5).slice(0, 8);
     const COLS = 2;
-    const ROWS = 5;
-    const zW = endZone.x2 - endZone.x1;
-    const zH = endZone.y2 - endZone.y1;
+    const ROWS = 4;
+    const spacing = config.gridSpacing ?? 38;
+    const cx = (endZone.x1 + endZone.x2) / 2;
+    const cy = (endZone.y1 + endZone.y2) / 2;
+    const gridW = (COLS - 1) * spacing;
+    const gridH = (ROWS - 1) * spacing;
     chosen.forEach((p, i) => {
       const col = i % COLS;
       const row = Math.floor(i / COLS);
       p.colorState = 'purple';
       p.colorProgress = 0;
-      p.gridX = endZone.x1 + (zW / (COLS + 1)) * (col + 1);
-      p.gridY = endZone.y1 + (zH / (ROWS + 1)) * (row + 1);
-      p.gridRow = col; // group key for per-column rect
+      p.gridX = cx - gridW / 2 + col * spacing;
+      p.gridY = cy - gridH / 2 + row * spacing;
+      p.gridRow = col;
       p.targetX = p.gridX;
       p.targetY = p.gridY;
     });
   }
 
   if (newStage === 5) {
-    // grid positions already set in stage 4 — updateGrid takes over from here
+    // grid positions set in stage 4; trail continues from hover
   }
 
   if (newStage === 6) {
-    const purple = particles.filter(p => p.colorState === 'purple');
-    if (purple.length > 0) {
-      const pad = 22;
-      const byRow = {};
-      for (const p of purple) {
-        const r = p.gridRow ?? 0;
-        if (!byRow[r]) byRow[r] = [];
-        byRow[r].push(p);
-      }
-      state.rigidBoundaryRects = Object.values(byRow).map(group => {
-        const xs = group.map(p => p.gridX);
-        const ys = group.map(p => p.gridY);
-        return {
-          x: Math.min(...xs) - pad,
-          y: Math.min(...ys) - pad,
-          w: Math.max(...xs) - Math.min(...xs) + pad * 2,
-          h: Math.max(...ys) - Math.min(...ys) + pad * 2,
-        };
-      });
-      state.rigidBoundaryProgress = 0;
-    }
+    // no rectangle — purple trail serves as visual grouping
   }
 }
 
@@ -174,32 +157,44 @@ function tickParticles(state, config, dt) {
       p.updateStage0(dt);
     } else if (stage === 2) {
       if (p.colorState === 'yellow') {
-        p.updateMigrate(p.targetX, p.targetY, dt);
+        p.updateMigrate(p.targetX, p.targetY, dt, config);
         if (Math.random() < 0.18) yellowTrail.addPoint(p.x, p.y);
       } else {
         p.updateStage0(dt);
       }
     } else if (stage === 3) {
-      if (p.colorState === 'yellow') p.updateSettle(dt);
-      else p.updateStage0(dt);
+      if (p.colorState === 'yellow') {
+        p.updateSettle(dt, config);
+        if (Math.random() < config.settleTrailPct) yellowTrail.addPoint(p.x, p.y);
+      } else p.updateStage0(dt);
     } else if (stage === 4) {
       if (p.colorState === 'purple') {
         p.colorProgress = Math.min(1, p.colorProgress + 0.02);
-        p.updateMigrate(p.targetX, p.targetY, dt);
+        p.updateMigrate(p.targetX, p.targetY, dt, config);
         if (Math.random() < 0.35) purpleTrail.addPoint(p.x, p.y);
       } else if (p.colorState === 'yellow') {
-        p.updateSettle(dt);
+        p.updateSettle(dt, config);
+        if (Math.random() < config.settleTrailPct) yellowTrail.addPoint(p.x, p.y);
       } else {
         p.updateStage0(dt);
       }
     } else if (stage === 5) {
-      if (p.colorState === 'purple') { p.colorProgress = 1; p.updateGrid(dt); }
-      else if (p.colorState === 'yellow') p.updateSettle(dt);
-      else p.updateStage0(dt);
+      if (p.colorState === 'purple') {
+        p.colorProgress = 1;
+        p.updateGrid(dt, config);
+        if (Math.random() < config.settleTrailPct) purpleTrail.addPoint(p.x, p.y);
+      } else if (p.colorState === 'yellow') {
+        p.updateSettle(dt, config);
+        if (Math.random() < config.settleTrailPct) yellowTrail.addPoint(p.x, p.y);
+      } else p.updateStage0(dt);
     } else if (stage === 6) {
-      if (p.colorState === 'purple') p.updateGrid(dt);
-      else if (p.colorState === 'yellow') p.updateSettle(dt);
-      else p.updateStage0(dt);
+      if (p.colorState === 'purple') {
+        p.updateGrid(dt, config);
+        if (Math.random() < config.settleTrailPct) purpleTrail.addPoint(p.x, p.y);
+      } else if (p.colorState === 'yellow') {
+        p.updateSettle(dt, config);
+        if (Math.random() < config.settleTrailPct) yellowTrail.addPoint(p.x, p.y);
+      } else p.updateStage0(dt);
     } else if (stage === 7) {
       const t = 1 - Math.min(1, stageElapsed / (config.stageDurations ?? defaultConfig.stageDurations)[7]);
       p.globalAlpha = t;
@@ -260,21 +255,13 @@ function tickParticles(state, config, dt) {
 // ---- render ----
 
 function renderFrame(bgCtx, fgCtx, state, config) {
-  const { width, height, particles, yellowTrail, purpleTrail, cursor, stage,
-          rigidBoundaryRects, rigidBoundaryProgress,
-          noisePattern } = state;
+  const { width, height, particles, yellowTrail, purpleTrail, cursor, stage, noisePattern } = state;
 
   bgCtx.fillStyle = config.bgColor;
   bgCtx.fillRect(0, 0, width, height);
 
-  yellowTrail.draw(bgCtx, '#ffffff', config);
-  purpleTrail.draw(bgCtx, config.purple, config);
-
-  if (stage >= 6 && rigidBoundaryRects?.length) {
-    for (const rect of rigidBoundaryRects) {
-      drawRigidBoundary(bgCtx, rect, rigidBoundaryProgress, config.purple);
-    }
-  }
+  yellowTrail.draw(bgCtx, config.gatherTrailColor, config);
+  purpleTrail.draw(bgCtx, config.hyperlinkTrailColor, config);
 
   fgCtx.clearRect(0, 0, width, height);
   for (const p of particles) {

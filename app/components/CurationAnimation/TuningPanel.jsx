@@ -1,16 +1,19 @@
 'use client';
 import { useState, useCallback } from 'react';
 
-function Slider({ label, min, max, step = 0.01, configKey, configRef }) {
+function Slider({ label, min, max, step = 0.001, configKey, configRef, format }) {
   const [val, setVal] = useState(configRef.current[configKey]);
   const onChange = useCallback(e => {
     const v = parseFloat(e.target.value);
     setVal(v);
     configRef.current[configKey] = v;
   }, [configKey, configRef]);
+  const display = format ? format(val) : (Number.isInteger(val) ? val : val.toFixed(3));
   return (
     <label style={labelStyle}>
-      <span>{label}: <b>{typeof val === 'number' && !Number.isInteger(val) ? val.toFixed(2) : val}</b></span>
+      <span style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span style={{ opacity: 0.8 }}>{label}</span><b>{display}</b>
+      </span>
       <input type="range" min={min} max={max} step={step} value={val} onChange={onChange} style={inputStyle} />
     </label>
   );
@@ -27,25 +30,15 @@ function StageSlider({ label, index, configRef }) {
   }, [index, configRef]);
   return (
     <label style={labelStyle}>
-      <span>{label}: <b>{val}ms</b></span>
-      <input type="range" min={200} max={10000} step={100} value={val} onChange={onChange} style={inputStyle} />
+      <span style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span style={{ opacity: 0.8 }}>{label}</span><b>{val}ms</b>
+      </span>
+      <input type="range" min={200} max={12000} step={100} value={val} onChange={onChange} style={inputStyle} />
     </label>
   );
 }
 
-function ColorPicker({ label, configKey, configRef }) {
-  const [val, setVal] = useState(configRef.current[configKey]);
-  const onChange = useCallback(e => {
-    setVal(e.target.value);
-    configRef.current[configKey] = e.target.value;
-  }, [configKey, configRef]);
-  return (
-    <label style={labelStyle}>
-      <span>{label}</span>
-      <input type="color" value={val} onChange={onChange} style={{ marginLeft: 6, cursor: 'pointer' }} />
-    </label>
-  );
-}
+const STAGE_LABELS = ['S0 Idle', 'S1 Click', 'S2 Gather', 'S3 Settle', 'S4 Split', 'S5 Grid', 'S6 Frame'];
 
 const panelStyle = {
   position: 'fixed',
@@ -56,36 +49,28 @@ const panelStyle = {
   border: '1px solid rgba(255,255,255,0.15)',
   borderRadius: 8,
   padding: '12px 14px',
-  width: 240,
+  width: 230,
   color: '#fff',
   fontFamily: 'monospace',
   fontSize: 11,
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
+  gap: 7,
   maxHeight: 'calc(100vh - 100px)',
   overflowY: 'auto',
 };
 
-const labelStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-};
-
+const labelStyle = { display: 'flex', flexDirection: 'column', gap: 3 };
 const inputStyle = { width: '100%', cursor: 'pointer' };
 
 const dividerStyle = {
   borderTop: '1px solid rgba(255,255,255,0.15)',
+  paddingTop: 6,
   marginTop: 2,
-  marginBottom: 2,
-  opacity: 0.6,
   fontSize: 10,
   letterSpacing: '0.08em',
-  paddingTop: 4,
+  opacity: 0.5,
 };
-
-const STAGE_NAMES = ['Idle', 'Click', 'Gather', 'Settle', 'Split', 'Grid', 'Frame', 'Dissolve'];
 
 const btnStyle = {
   padding: '5px 10px',
@@ -103,8 +88,15 @@ export default function TuningPanel({ configRef, restartRef }) {
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
-    const { stageDurations, ...rest } = configRef.current;
-    const out = { ...rest, stageDurations: [...stageDurations] };
+    const keys = [
+      'speed', 'stageDurations',
+      'migrateSpring', 'migrateDamping', 'migrateNoise',
+      'settleOrbit', 'settleDamping',
+      'gridSpring', 'gridDamping',
+      'cursorSpeed', 'cursorPausePct',
+    ];
+    const out = Object.fromEntries(keys.map(k => [k, configRef.current[k]]));
+    out.stageDurations = [...configRef.current.stageDurations];
     navigator.clipboard.writeText(JSON.stringify(out, null, 2));
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
@@ -112,29 +104,37 @@ export default function TuningPanel({ configRef, restartRef }) {
 
   return (
     <div style={panelStyle}>
-      <div style={{ fontWeight: 'bold', marginBottom: 4, letterSpacing: '0.1em', opacity: 0.6 }}>
-        TUNING
-      </div>
+      <div style={{ fontWeight: 'bold', letterSpacing: '0.1em', opacity: 0.6 }}>TIMING + EASING</div>
       <div style={{ display: 'flex', gap: 6 }}>
         <button style={btnStyle} onClick={() => restartRef.current?.()}>↺ Restart</button>
         <button style={btnStyle} onClick={handleCopy}>{copied ? '✓ Copied' : '⧉ Copy'}</button>
       </div>
-      <Slider label="% clicked" min={0.1} max={1} step={0.05} configKey="clickedPct" configRef={configRef} />
-      <Slider label="Speed" min={0.1} max={5} step={0.05} configKey="speed" configRef={configRef} />
-      <Slider label="Trail opacity" min={0.01} max={0.15} configKey="trailOpacity" configRef={configRef} />
-      <Slider label="Trail radius" min={20} max={120} step={1} configKey="trailBlobRadius" configRef={configRef} />
-      <Slider label="Cursor size" min={8} max={48} step={1} configKey="cursorSize" configRef={configRef} />
-      <Slider label="Cursor stagger %" min={0} max={1} step={0.05} configKey="cursorPausePct" configRef={configRef} />
+
+      <div style={dividerStyle}>GLOBAL</div>
+      <Slider label="Speed" min={0.1} max={4} step={0.05} configKey="speed" configRef={configRef} />
 
       <div style={dividerStyle}>STAGE DURATIONS</div>
-      {STAGE_NAMES.map((name, i) => (
-        <StageSlider key={i} label={`S${i} ${name}`} index={i} configRef={configRef} />
+      {STAGE_LABELS.map((name, i) => (
+        <StageSlider key={i} label={name} index={i} configRef={configRef} />
       ))}
 
-      <div style={dividerStyle}>COLORS</div>
-      <ColorPicker label="Purple" configKey="purple" configRef={configRef} />
-      <ColorPicker label="Circle fill" configKey="circleFill" configRef={configRef} />
-      <ColorPicker label="Circle stroke" configKey="circleStroke" configRef={configRef} />
+      <div style={dividerStyle}>GATHER / SPLIT — spring physics</div>
+      <Slider label="Spring" min={0.001} max={0.06} step={0.001} configKey="migrateSpring" configRef={configRef} />
+      <Slider label="Damping" min={0.7} max={0.99} step={0.005} configKey="migrateDamping" configRef={configRef} />
+      <Slider label="Noise" min={0} max={0.5} step={0.005} configKey="migrateNoise" configRef={configRef} />
+
+      <div style={dividerStyle}>SETTLE — hover physics</div>
+      <Slider label="Orbit radius" min={0} max={0.4} step={0.005} configKey="settleOrbit" configRef={configRef} />
+      <Slider label="Damping" min={0.7} max={0.99} step={0.005} configKey="settleDamping" configRef={configRef} />
+
+      <div style={dividerStyle}>GRID — snap physics</div>
+      <Slider label="Spacing" min={16} max={80} step={1} configKey="gridSpacing" configRef={configRef} format={v => `${v}px`} />
+      <Slider label="Spring" min={0.01} max={0.2} step={0.005} configKey="gridSpring" configRef={configRef} />
+      <Slider label="Damping" min={0.5} max={0.99} step={0.005} configKey="gridDamping" configRef={configRef} />
+
+      <div style={dividerStyle}>CURSOR</div>
+      <Slider label="Speed" min={0.5} max={8} step={0.1} configKey="cursorSpeed" configRef={configRef} />
+      <Slider label="Pause %" min={0} max={1} step={0.05} configKey="cursorPausePct" configRef={configRef} format={v => `${Math.round(v * 100)}%`} />
     </div>
   );
 }

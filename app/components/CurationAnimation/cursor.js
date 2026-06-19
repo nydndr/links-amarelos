@@ -13,7 +13,6 @@ export class Cursor {
     this.path = [];
     this.pathIdx = 0;
     this.pathT = 0;
-    this.speed = 2.5;
     this.pauseTimer = 0;
     this.entranceTimer = 0;
     this.entranceDuration = 900;
@@ -59,7 +58,7 @@ export class Cursor {
       return;
     }
 
-    this.pathT += this.speed / segLen;
+    this.pathT += (config.cursorSpeed ?? 2.5) / segLen;
     if (this.pathT >= 1) {
       this.pathT = 0;
       this.pathIdx++;

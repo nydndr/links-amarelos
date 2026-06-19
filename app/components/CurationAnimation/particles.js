@@ -91,56 +91,59 @@ export class Particle {
     this.y += this.vy;
   }
 
-  updateMigrate(targetX, targetY, dt) {
+  updateMigrate(targetX, targetY, dt, config = {}) {
+    const spring = config.migrateSpring ?? 0.010;
+    const damping = config.migrateDamping ?? 0.85;
+    const noise = config.migrateNoise ?? 0.18;
     const dx = targetX - this.x;
     const dy = targetY - this.y;
     const dist = Math.hypot(dx, dy);
 
-    // Gentle spring — slow enough to look like flowing, not snapping
-    this.vx += dx * 0.010;
-    this.vy += dy * 0.010;
+    this.vx += dx * spring;
+    this.vy += dy * spring;
 
-    // Perpendicular wander arc that fades as particle nears target
     const wanderStrength = Math.min(dist * 0.004, 0.5);
     this.vx += Math.cos(this.wanderAngle) * wanderStrength;
     this.vy += Math.sin(this.wanderAngle) * wanderStrength;
     this.wanderAngle += (Math.random() - 0.5) * 0.12;
     this.wanderAngle *= this.wanderDecay;
 
-    this.vx += (Math.random() - 0.5) * 0.18;
-    this.vy += (Math.random() - 0.5) * 0.18;
-    this.vx *= 0.85;
-    this.vy *= 0.85;
+    this.vx += (Math.random() - 0.5) * noise;
+    this.vy += (Math.random() - 0.5) * noise;
+    this.vx *= damping;
+    this.vy *= damping;
     this.x += this.vx;
     this.y += this.vy;
   }
 
-  updateSettle(dt) {
-    // Orbit gently around target — same feel as stage 0 but anchored to targetX/Y
+  updateSettle(dt, config = {}) {
+    const orbitMult = config.settleOrbit ?? 0.07;
+    const damping = config.settleDamping ?? 0.94;
     this.orbitAngle += this.orbitSpeed;
-    const ox = this.targetX + Math.cos(this.orbitAngle) * (this.orbitRadius * 0.07);
-    const oy = this.targetY + Math.sin(this.orbitAngle) * (this.orbitRadius * 0.07);
+    const ox = this.targetX + Math.cos(this.orbitAngle) * (this.orbitRadius * orbitMult);
+    const oy = this.targetY + Math.sin(this.orbitAngle) * (this.orbitRadius * orbitMult);
     this.vx += (ox - this.x) * 0.004;
     this.vy += (oy - this.y) * 0.004;
     this.vx += (Math.random() - 0.5) * 0.05;
     this.vy += (Math.random() - 0.5) * 0.05;
-    this.vx *= 0.94;
-    this.vy *= 0.94;
+    this.vx *= damping;
+    this.vy *= damping;
     this.x += this.vx;
     this.y += this.vy;
   }
 
-  updateGrid(dt) {
-    // Tiny slow orbit around grid pin
+  updateGrid(dt, config = {}) {
+    const spring = config.gridSpring ?? 0.06;
+    const damping = config.gridDamping ?? 0.82;
     this.orbitAngle += this.orbitSpeed * 0.3;
     const ox = this.gridX + Math.cos(this.orbitAngle) * (this.orbitRadius * 0.12);
     const oy = this.gridY + Math.sin(this.orbitAngle) * (this.orbitRadius * 0.12);
-    this.vx += (ox - this.x) * 0.06;
-    this.vy += (oy - this.y) * 0.06;
+    this.vx += (ox - this.x) * spring;
+    this.vy += (oy - this.y) * spring;
     this.vx += (Math.random() - 0.5) * 0.02;
     this.vy += (Math.random() - 0.5) * 0.02;
-    this.vx *= 0.82;
-    this.vy *= 0.82;
+    this.vx *= damping;
+    this.vy *= damping;
     this.x += this.vx;
     this.y += this.vy;
   }
@@ -194,6 +197,14 @@ export class Particle {
       ctx.strokeStyle = strokeColor;
       ctx.lineWidth = 1;
       ctx.stroke();
+    } else if (this.type === 'airy') {
+      ctx.fillStyle = fillColor;
+      ctx.globalAlpha = this.globalAlpha * 0.38;
+      ctx.fill();
+      ctx.globalAlpha = this.globalAlpha * 0.55;
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 1;
+      ctx.stroke();
     } else {
       ctx.fillStyle = fillColor;
       ctx.fill();
@@ -204,7 +215,7 @@ export class Particle {
 }
 
 export function spawnParticles(count, zones, axis, config) {
-  const types = ['solid', 'solid', 'outline', 'textured'];
+  const types = ['airy', 'airy', 'outline', 'textured'];
   const particles = [];
   const { circleSizeMin, circleSizeMax } = config;
 

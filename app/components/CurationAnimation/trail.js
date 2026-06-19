@@ -1,7 +1,7 @@
 export class Trail {
   constructor() {
     this.points = []; // { x, y, age }
-    this.maxAge = 90; // frames
+    this.maxAge = 3600; // frames (~60s at 60fps — effectively permanent)
   }
 
   addPoint(x, y) {
