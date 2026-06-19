@@ -46,6 +46,10 @@ export class Particle {
     this.gridX = x;
     this.gridY = y;
 
+    // organic gather path
+    this.wanderAngle = Math.random() * Math.PI * 2;
+    this.wanderDecay = 0.994 + Math.random() * 0.005; // slow individual decay rates
+
     // click animation
     this.clickScale = 1;
     this.clickTimer = 0;
@@ -90,12 +94,23 @@ export class Particle {
   updateMigrate(targetX, targetY, dt) {
     const dx = targetX - this.x;
     const dy = targetY - this.y;
-    this.vx += dx * 0.035;
-    this.vy += dy * 0.035;
-    this.vx += (Math.random() - 0.5) * 0.1;
-    this.vy += (Math.random() - 0.5) * 0.1;
-    this.vx *= 0.88;
-    this.vy *= 0.88;
+    const dist = Math.hypot(dx, dy);
+
+    // Gentle spring — slow enough to look like flowing, not snapping
+    this.vx += dx * 0.010;
+    this.vy += dy * 0.010;
+
+    // Perpendicular wander arc that fades as particle nears target
+    const wanderStrength = Math.min(dist * 0.004, 0.5);
+    this.vx += Math.cos(this.wanderAngle) * wanderStrength;
+    this.vy += Math.sin(this.wanderAngle) * wanderStrength;
+    this.wanderAngle += (Math.random() - 0.5) * 0.12;
+    this.wanderAngle *= this.wanderDecay;
+
+    this.vx += (Math.random() - 0.5) * 0.18;
+    this.vy += (Math.random() - 0.5) * 0.18;
+    this.vx *= 0.85;
+    this.vy *= 0.85;
     this.x += this.vx;
     this.y += this.vy;
   }
@@ -103,8 +118,8 @@ export class Particle {
   updateSettle(dt) {
     // Orbit gently around target — same feel as stage 0 but anchored to targetX/Y
     this.orbitAngle += this.orbitSpeed;
-    const ox = this.targetX + Math.cos(this.orbitAngle) * (this.orbitRadius * 0.3);
-    const oy = this.targetY + Math.sin(this.orbitAngle) * (this.orbitRadius * 0.3);
+    const ox = this.targetX + Math.cos(this.orbitAngle) * (this.orbitRadius * 0.07);
+    const oy = this.targetY + Math.sin(this.orbitAngle) * (this.orbitRadius * 0.07);
     this.vx += (ox - this.x) * 0.004;
     this.vy += (oy - this.y) * 0.004;
     this.vx += (Math.random() - 0.5) * 0.05;

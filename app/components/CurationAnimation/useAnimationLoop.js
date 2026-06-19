@@ -41,7 +41,7 @@ function createInitialState(w, h, config) {
     cursor: new Cursor(),
     organicBoundaryPoints: null,
     organicBoundaryProgress: 0,
-    rigidBoundaryRect: null,
+    rigidBoundaryRects: null,
     rigidBoundaryProgress: 0,
     logoOpacity: { linksAmarelos: 0, ondasAmarelas: 0, hyperlinks: 0 },
     noisePattern: null,
@@ -84,9 +84,17 @@ function enterStage(state, newStage, config) {
 
   if (newStage === 2) {
     cursor.exit();
+    const { width, height } = state;
+    const cx = width / 2;
+    const cy = height / 2;
+    // Max radius: small enough to stay clear of stage-1 start zone (left third + pad)
+    const safeLeft = width / 3 + (config.pad ?? 56) * 0.5;
+    const maxR = Math.min(cx - safeLeft, Math.min(width, height) * 0.18);
     particles.filter(p => p.colorState === 'yellow').forEach(p => {
-      p.targetX = centerZone.x1 + Math.random() * (centerZone.x2 - centerZone.x1) * 0.65;
-      p.targetY = centerZone.y1 + Math.random() * (centerZone.y2 - centerZone.y1);
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.sqrt(Math.random()) * maxR; // sqrt = uniform disk distribution
+      p.targetX = cx + Math.cos(angle) * r;
+      p.targetY = cy + Math.sin(angle) * r;
     });
   }
 
@@ -98,11 +106,7 @@ function enterStage(state, newStage, config) {
       Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy)
     );
     const innerCount = Math.floor(sorted.length * 0.6);
-    const edgeP = sorted[Math.min(innerCount, sorted.length - 1)];
-    const boundaryR = Math.hypot(edgeP.x - cx, edgeP.y - cy) + 30;
     sorted.forEach((p, i) => { p.zone = i < innerCount ? 'inner' : 'outer'; });
-    state.organicBoundaryPoints = generateOrganicPoints(cx, cy, boundaryR);
-    state.organicBoundaryProgress = 0;
     yellow.forEach(p => {
       p.targetX = p.x + (Math.random() - 0.5) * 8;
       p.targetY = p.y + (Math.random() - 0.5) * 8;
@@ -110,38 +114,49 @@ function enterStage(state, newStage, config) {
   }
 
   if (newStage === 4) {
-    particles.filter(p => p.colorState === 'yellow' && p.zone === 'outer').forEach(p => {
+    const outer = particles.filter(p => p.colorState === 'yellow' && p.zone === 'outer');
+    const chosen = outer.sort(() => Math.random() - 0.5).slice(0, 10);
+    const COLS = 2;
+    const ROWS = 5;
+    const zW = endZone.x2 - endZone.x1;
+    const zH = endZone.y2 - endZone.y1;
+    chosen.forEach((p, i) => {
+      const col = i % COLS;
+      const row = Math.floor(i / COLS);
       p.colorState = 'purple';
       p.colorProgress = 0;
-      p.targetX = endZone.x1 + Math.random() * (endZone.x2 - endZone.x1);
-      p.targetY = endZone.y1 + Math.random() * (endZone.y2 - endZone.y1);
+      p.gridX = endZone.x1 + (zW / (COLS + 1)) * (col + 1);
+      p.gridY = endZone.y1 + (zH / (ROWS + 1)) * (row + 1);
+      p.gridRow = col; // group key for per-column rect
+      p.targetX = p.gridX;
+      p.targetY = p.gridY;
     });
   }
 
   if (newStage === 5) {
-    const purple = particles.filter(p => p.colorState === 'purple');
-    const cols = Math.max(2, Math.ceil(Math.sqrt(purple.length * 0.8)));
-    const rows = Math.ceil(purple.length / cols);
-    const zW = endZone.x2 - endZone.x1;
-    const zH = endZone.y2 - endZone.y1;
-    purple.forEach((p, i) => {
-      p.gridX = endZone.x1 + (zW / (cols + 1)) * ((i % cols) + 1);
-      p.gridY = endZone.y1 + (zH / (rows + 1)) * (Math.floor(i / cols) + 1);
-    });
+    // grid positions already set in stage 4 — updateGrid takes over from here
   }
 
   if (newStage === 6) {
     const purple = particles.filter(p => p.colorState === 'purple');
     if (purple.length > 0) {
-      const xs = purple.map(p => p.gridX);
-      const ys = purple.map(p => p.gridY);
-      const pad = 20;
-      state.rigidBoundaryRect = {
-        x: Math.min(...xs) - pad,
-        y: Math.min(...ys) - pad,
-        w: Math.max(...xs) - Math.min(...xs) + pad * 2,
-        h: Math.max(...ys) - Math.min(...ys) + pad * 2,
-      };
+      const pad = 22;
+      const byRow = {};
+      for (const p of purple) {
+        const r = p.gridRow ?? 0;
+        if (!byRow[r]) byRow[r] = [];
+        byRow[r].push(p);
+      }
+      state.rigidBoundaryRects = Object.values(byRow).map(group => {
+        const xs = group.map(p => p.gridX);
+        const ys = group.map(p => p.gridY);
+        return {
+          x: Math.min(...xs) - pad,
+          y: Math.min(...ys) - pad,
+          w: Math.max(...xs) - Math.min(...xs) + pad * 2,
+          h: Math.max(...ys) - Math.min(...ys) + pad * 2,
+        };
+      });
       state.rigidBoundaryProgress = 0;
     }
   }
@@ -160,7 +175,7 @@ function tickParticles(state, config, dt) {
     } else if (stage === 2) {
       if (p.colorState === 'yellow') {
         p.updateMigrate(p.targetX, p.targetY, dt);
-        if (Math.random() < 0.4) yellowTrail.addPoint(p.x, p.y);
+        if (Math.random() < 0.18) yellowTrail.addPoint(p.x, p.y);
       } else {
         p.updateStage0(dt);
       }
@@ -242,60 +257,23 @@ function tickParticles(state, config, dt) {
   }
 }
 
-// ---- logo drawing ----
-
-function drawLogo(ctx, img, cx, bottomY, maxW, maxH, opacity) {
-  if (!img || opacity <= 0) return;
-  const aspect = (img.naturalWidth || img.width) / (img.naturalHeight || img.height || 1);
-  let w = maxW;
-  let h = w / aspect;
-  if (h > maxH) { h = maxH; w = h * aspect; }
-  ctx.save();
-  ctx.globalAlpha = Math.min(1, opacity);
-  ctx.drawImage(img, cx - w / 2, bottomY - h, w, h);
-  ctx.restore();
-}
-
 // ---- render ----
 
-function renderFrame(bgCtx, fgCtx, state, config, logos) {
+function renderFrame(bgCtx, fgCtx, state, config) {
   const { width, height, particles, yellowTrail, purpleTrail, cursor, stage,
-          organicBoundaryPoints, organicBoundaryProgress,
-          rigidBoundaryRect, rigidBoundaryProgress,
-          logoOpacity, zones, noisePattern } = state;
+          rigidBoundaryRects, rigidBoundaryProgress,
+          noisePattern } = state;
 
   bgCtx.fillStyle = config.bgColor;
   bgCtx.fillRect(0, 0, width, height);
 
-  yellowTrail.draw(bgCtx, config.yellow, config);
+  yellowTrail.draw(bgCtx, '#ffffff', config);
   purpleTrail.draw(bgCtx, config.purple, config);
 
-  if (stage >= 3 && organicBoundaryPoints) {
-    drawOrganicBoundary(bgCtx, organicBoundaryPoints, organicBoundaryProgress, config.yellow);
-  }
-  if (stage >= 6 && rigidBoundaryRect) {
-    drawRigidBoundary(bgCtx, rigidBoundaryRect, rigidBoundaryProgress, config.purple);
-  }
-
-  const cz = zones.center;
-  const ez = zones.end;
-  const logoH = 28;
-
-  const pad = config.pad ?? 56;
-  if (logos.linksAmarelos) {
-    const logoMaxW = (cz.x2 - cz.x1) * 0.45;
-    drawLogo(bgCtx, logos.linksAmarelos,
-      cz.x1 + (cz.x2 - cz.x1) * 0.28, height - pad, logoMaxW, logoH, logoOpacity.linksAmarelos);
-  }
-  if (logos.ondasAmarelas) {
-    const logoMaxW = (cz.x2 - cz.x1) * 0.45;
-    drawLogo(bgCtx, logos.ondasAmarelas,
-      cz.x1 + (cz.x2 - cz.x1) * 0.72, height - pad, logoMaxW, logoH, logoOpacity.ondasAmarelas);
-  }
-  if (logos.hyperlinks) {
-    const logoMaxW = (ez.x2 - ez.x1) * 0.65;
-    drawLogo(bgCtx, logos.hyperlinks,
-      (ez.x1 + ez.x2) / 2, height - pad, logoMaxW, logoH, logoOpacity.hyperlinks);
+  if (stage >= 6 && rigidBoundaryRects?.length) {
+    for (const rect of rigidBoundaryRects) {
+      drawRigidBoundary(bgCtx, rect, rigidBoundaryProgress, config.purple);
+    }
   }
 
   fgCtx.clearRect(0, 0, width, height);
@@ -310,31 +288,12 @@ function renderFrame(bgCtx, fgCtx, state, config, logos) {
 export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configRef, onStageChange) {
   const stateRef = useRef(null);
   const rafRef = useRef(null);
-  const logosRef = useRef({});
   const lastTimeRef = useRef(0);
   const [currentStage, setCurrentStage] = useState(0);
   const restartFnRef = useRef(null);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    async function preloadLogos() {
-      const files = {
-        linksAmarelos: '/brand/links-logotype-long.svg',
-        ondasAmarelas: '/brand/ondas-logotype-long.svg',
-        hyperlinks: '/brand/hyperlinks-logotype-logo.svg',
-      };
-      await Promise.all(
-        Object.entries(files).map(([key, src]) =>
-          new Promise(resolve => {
-            const img = new Image();
-            img.onload = () => { logosRef.current[key] = img; resolve(); };
-            img.onerror = resolve;
-            img.src = src;
-          })
-        )
-      );
-    }
 
     function setupCanvas(canvas, w, h) {
       const dpr = window.devicePixelRatio || 1;
@@ -380,8 +339,8 @@ export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configR
       // Advance animation time (speed-scaled)
       state.stageElapsed += dt * config.speed;
 
-      if (state.stageElapsed >= (config.stageDurations ?? defaultConfig.stageDurations)[state.stage]) {
-        const next = (state.stage + 1) % 8;
+      if (state.stage < 6 && state.stageElapsed >= (config.stageDurations ?? defaultConfig.stageDurations)[state.stage]) {
+        const next = state.stage + 1;
         enterStage(state, next, config);
         setCurrentStage(next);
         onStageChange?.(next);
@@ -391,7 +350,7 @@ export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configR
 
       const bgCtx = bgCanvasRef.current?.getContext('2d');
       const fgCtx = fgCanvasRef.current?.getContext('2d');
-      if (bgCtx && fgCtx) renderFrame(bgCtx, fgCtx, state, config, logosRef.current);
+      if (bgCtx && fgCtx) renderFrame(bgCtx, fgCtx, state, config);
 
       rafRef.current = requestAnimationFrame(tick);
     }
@@ -431,7 +390,7 @@ export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configR
         state.stage = 3;
         const bgCtx = bgCanvasRef.current?.getContext('2d');
         const fgCtx = fgCanvasRef.current?.getContext('2d');
-        if (bgCtx && fgCtx) renderFrame(bgCtx, fgCtx, state, config, logosRef.current);
+        if (bgCtx && fgCtx) renderFrame(bgCtx, fgCtx, state, config);
       }, 300);
     } else {
       io = new IntersectionObserver(entries => {
@@ -447,8 +406,6 @@ export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configR
       setCurrentStage(0);
       onStageChange?.(0);
     };
-
-    preloadLogos();
 
     return () => {
       stopLoop();

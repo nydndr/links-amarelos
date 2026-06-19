@@ -2,8 +2,8 @@ export const defaultConfig = {
   totalCircles: 100,
   clickedPct: 0.30,
   speed: 1,
-  trailOpacity: 0.06,
-  trailBlobRadius: 60,
+  trailOpacity: 0.028,
+  trailBlobRadius: 48,
   circleSizeMin: 5,
   circleSizeMax: 10,
   cursorSize: 20,
@@ -15,7 +15,7 @@ export const defaultConfig = {
   circleFill: '#E8E8E8',
   circleStroke: '#888888',
   // ms per stage at speed=1: idle, click, gather, settle, split, grid, frame, dissolve
-  stageDurations: [2000, 4500, 2500, 4000, 2500, 2000, 2500, 1500],
+  stageDurations: [2000, 4500, 3500, 4000, 2500, 2000, 2500, 1500],
 };
 
 export function hexToRgb(hex) {
