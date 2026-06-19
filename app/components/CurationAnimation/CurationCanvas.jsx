@@ -2,12 +2,13 @@
 import { useRef } from 'react';
 import { useAnimationLoop } from './useAnimationLoop';
 
-export default function CurationCanvas({ configRef, onStageChange }) {
+export default function CurationCanvas({ configRef, onStageChange, restartRef }) {
   const containerRef = useRef(null);
   const bgCanvasRef = useRef(null);
   const fgCanvasRef = useRef(null);
 
-  useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configRef, onStageChange);
+  const { restart } = useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configRef, onStageChange);
+  if (restartRef) restartRef.current = restart;
 
   return (
     <div

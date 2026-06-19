@@ -1,25 +1,26 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { spawnParticles, createNoisePattern } from './particles';
 import { Trail } from './trail';
 import { Cursor, buildCursorPath } from './cursor';
 import { generateOrganicPoints, drawOrganicBoundary, drawRigidBoundary } from './boundaries';
-import { STAGE_DURATIONS } from './config';
+import { defaultConfig } from './config';
 
 // ---- zone helpers ----
 
-function computeZones(w, h, axis) {
+function computeZones(w, h, axis, config) {
+  const pad = config.pad ?? 56;
   if (axis === 'horizontal') {
     return {
-      start: { x1: 0, y1: 0, x2: w / 3, y2: h },
-      center: { x1: w / 3, y1: 0, x2: (2 * w) / 3, y2: h },
-      end: { x1: (2 * w) / 3, y1: 0, x2: w, y2: h },
+      start: { x1: pad, y1: pad, x2: w / 3, y2: h - pad },
+      center: { x1: w / 3, y1: pad, x2: (2 * w) / 3, y2: h - pad },
+      end: { x1: (2 * w) / 3, y1: pad, x2: w - pad, y2: h - pad },
     };
   }
   return {
-    start: { x1: 0, y1: 0, x2: w, y2: h / 3 },
-    center: { x1: 0, y1: h / 3, x2: w, y2: (2 * h) / 3 },
-    end: { x1: 0, y1: (2 * h) / 3, x2: w, y2: h },
+    start: { x1: pad, y1: pad, x2: w - pad, y2: h / 3 },
+    center: { x1: pad, y1: h / 3, x2: w - pad, y2: (2 * h) / 3 },
+    end: { x1: pad, y1: (2 * h) / 3, x2: w - pad, y2: h - pad },
   };
 }
 
@@ -27,7 +28,7 @@ function computeZones(w, h, axis) {
 
 function createInitialState(w, h, config) {
   const axis = w >= 768 ? 'horizontal' : 'vertical';
-  const zones = computeZones(w, h, axis);
+  const zones = computeZones(w, h, axis, config);
   const count = axis === 'horizontal' ? config.totalCircles : Math.floor(config.totalCircles * 0.5);
   const particles = spawnParticles(count, zones, axis, config);
 
@@ -72,10 +73,13 @@ function enterStage(state, newStage, config) {
   const endZone = zones.end;
 
   if (newStage === 1) {
-    const waypoints = buildCursorPath(particles, zones, axis);
-    cursor.setPath(waypoints);
     state.targetClickCount = Math.floor(particles.length * config.clickedPct);
     state.clickedCount = 0;
+    // Pre-mark exactly targetClickCount particles — cursor clicks only these
+    const shuffled = [...particles].sort(() => Math.random() - 0.5);
+    shuffled.forEach((p, i) => { p.willBeClicked = i < state.targetClickCount; });
+    const waypoints = buildCursorPath(particles, zones, axis);
+    cursor.setPath(waypoints);
   }
 
   if (newStage === 2) {
@@ -182,20 +186,19 @@ function tickParticles(state, config, dt) {
       else if (p.colorState === 'yellow') p.updateSettle(dt);
       else p.updateStage0(dt);
     } else if (stage === 7) {
-      const t = 1 - Math.min(1, stageElapsed / STAGE_DURATIONS[7]);
+      const t = 1 - Math.min(1, stageElapsed / (config.stageDurations ?? defaultConfig.stageDurations)[7]);
       p.globalAlpha = t;
     }
   }
 
-  // Click detection during stage 1
+  // Click detection during stage 1 — only pre-marked particles, no proximity gate
   if (stage === 1) {
-    cursor.update(dt);
-    const clickR = config.cursorSize * 1.4;
+    cursor.update(dt, config);
+    const clickR = config.cursorSize * 3;
     if (state.clickedCount < state.targetClickCount) {
       for (const p of particles) {
-        if (!p.clicked && cursor.isNear(p.x, p.y, clickR)) {
+        if (p.willBeClicked && !p.clicked && cursor.isNear(p.x, p.y, clickR)) {
           p.triggerClick();
-          cursor.click();
           state.clickedCount++;
           break;
         }
@@ -207,8 +210,9 @@ function tickParticles(state, config, dt) {
   purpleTrail.update();
 
   // Boundary + logo progress (uses animation-ms)
-  const d3 = STAGE_DURATIONS[3];
-  const d6 = STAGE_DURATIONS[6];
+  const sd = config.stageDurations ?? defaultConfig.stageDurations;
+  const d3 = sd[3];
+  const d6 = sd[6];
 
   if (stage === 3) {
     state.organicBoundaryProgress = Math.min(1, stageElapsed / (d3 * 0.45));
@@ -227,7 +231,7 @@ function tickParticles(state, config, dt) {
     state.logoOpacity.hyperlinks = Math.min(1, ht);
   }
   if (stage === 7) {
-    const t = 1 - Math.min(1, stageElapsed / STAGE_DURATIONS[7]);
+    const t = 1 - Math.min(1, stageElapsed / sd[7]);
     state.logoOpacity.linksAmarelos = t;
     state.logoOpacity.ondasAmarelas = t;
     state.logoOpacity.hyperlinks = t;
@@ -277,20 +281,21 @@ function renderFrame(bgCtx, fgCtx, state, config, logos) {
   const ez = zones.end;
   const logoH = 28;
 
+  const pad = config.pad ?? 56;
   if (logos.linksAmarelos) {
     const logoMaxW = (cz.x2 - cz.x1) * 0.45;
     drawLogo(bgCtx, logos.linksAmarelos,
-      cz.x1 + (cz.x2 - cz.x1) * 0.28, height - 12, logoMaxW, logoH, logoOpacity.linksAmarelos);
+      cz.x1 + (cz.x2 - cz.x1) * 0.28, height - pad, logoMaxW, logoH, logoOpacity.linksAmarelos);
   }
   if (logos.ondasAmarelas) {
     const logoMaxW = (cz.x2 - cz.x1) * 0.45;
     drawLogo(bgCtx, logos.ondasAmarelas,
-      cz.x1 + (cz.x2 - cz.x1) * 0.72, height - 12, logoMaxW, logoH, logoOpacity.ondasAmarelas);
+      cz.x1 + (cz.x2 - cz.x1) * 0.72, height - pad, logoMaxW, logoH, logoOpacity.ondasAmarelas);
   }
   if (logos.hyperlinks) {
     const logoMaxW = (ez.x2 - ez.x1) * 0.65;
     drawLogo(bgCtx, logos.hyperlinks,
-      (ez.x1 + ez.x2) / 2, height - 12, logoMaxW, logoH, logoOpacity.hyperlinks);
+      (ez.x1 + ez.x2) / 2, height - pad, logoMaxW, logoH, logoOpacity.hyperlinks);
   }
 
   fgCtx.clearRect(0, 0, width, height);
@@ -308,6 +313,7 @@ export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configR
   const logosRef = useRef({});
   const lastTimeRef = useRef(0);
   const [currentStage, setCurrentStage] = useState(0);
+  const restartFnRef = useRef(null);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -374,7 +380,7 @@ export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configR
       // Advance animation time (speed-scaled)
       state.stageElapsed += dt * config.speed;
 
-      if (state.stageElapsed >= STAGE_DURATIONS[state.stage]) {
+      if (state.stageElapsed >= (config.stageDurations ?? defaultConfig.stageDurations)[state.stage]) {
         const next = (state.stage + 1) % 8;
         enterStage(state, next, config);
         setCurrentStage(next);
@@ -434,6 +440,14 @@ export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configR
       if (container) io.observe(container);
     }
 
+    restartFnRef.current = () => {
+      const state = stateRef.current;
+      if (!state) return;
+      enterStage(state, 0, configRef.current);
+      setCurrentStage(0);
+      onStageChange?.(0);
+    };
+
     preloadLogos();
 
     return () => {
@@ -443,5 +457,7 @@ export function useAnimationLoop(containerRef, bgCanvasRef, fgCanvasRef, configR
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return { currentStage };
+  const restart = useCallback(() => restartFnRef.current?.(), []);
+
+  return { currentStage, restart };
 }

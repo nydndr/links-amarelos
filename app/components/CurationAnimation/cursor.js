@@ -1,23 +1,30 @@
+// easeOutBack — overshoots then settles, Emil Kowalski signature
+function easeOutBack(t) {
+  const c1 = 1.70158;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
+
 export class Cursor {
   constructor() {
     this.x = -100;
     this.y = -100;
     this.visible = false;
-    this.path = []; // [{x, y}] waypoints
+    this.path = [];
     this.pathIdx = 0;
-    this.pathT = 0; // 0-1 progress between waypoints
-    this.speed = 2.5; // px/frame between waypoints
-
-    this.clickScale = 1;
-    this.clickTimer = 0;
-    this.rippleRadius = 0;
-    this.rippleOpacity = 0;
+    this.pathT = 0;
+    this.speed = 2.5;
+    this.pauseTimer = 0;
+    this.entranceTimer = 0;
+    this.entranceDuration = 900;
   }
 
   setPath(waypoints) {
     this.path = waypoints;
     this.pathIdx = 0;
     this.pathT = 0;
+    this.entranceTimer = 0;
+    this.pauseTimer = this.entranceDuration + 120;
     if (waypoints.length > 0) {
       this.x = waypoints[0].x;
       this.y = waypoints[0].y;
@@ -25,35 +32,24 @@ export class Cursor {
     this.visible = true;
   }
 
-  click() {
-    this.clickScale = 1.3;
-    this.clickTimer = 120;
-    this.rippleRadius = 0;
-    this.rippleOpacity = 0.8;
-  }
+  get isPausing() { return this.pauseTimer > 0; }
 
-  update(dt) {
-    // click scale animation
-    if (this.clickTimer > 0) {
-      this.clickTimer -= dt;
-      const t = 1 - Math.max(0, this.clickTimer) / 120;
-      this.clickScale = t < 0.5
-        ? 1 + 0.3 * (t / 0.5)
-        : 1.3 - 0.3 * ((t - 0.5) / 0.5);
-    } else {
-      this.clickScale = 1;
+  click() {}
+
+  update(dt, config = {}) {
+    if (!this.visible) return;
+
+    if (this.entranceTimer < this.entranceDuration) {
+      this.entranceTimer = Math.min(this.entranceDuration, this.entranceTimer + dt);
     }
 
-    // ripple
-    if (this.rippleOpacity > 0) {
-      this.rippleRadius += 1.2;
-      this.rippleOpacity -= 0.025;
-      if (this.rippleOpacity < 0) this.rippleOpacity = 0;
-    }
+    if (this.path.length < 2 || this.pathIdx >= this.path.length - 1) return;
 
-    // path following
-    if (!this.visible || this.path.length < 2) return;
-    if (this.pathIdx >= this.path.length - 1) return;
+    // Thinking pause — cursor idles before moving to next target
+    if (this.pauseTimer > 0) {
+      this.pauseTimer -= dt;
+      return;
+    }
 
     const from = this.path[this.pathIdx];
     const to = this.path[this.pathIdx + 1];
@@ -67,6 +63,9 @@ export class Cursor {
     if (this.pathT >= 1) {
       this.pathT = 0;
       this.pathIdx++;
+      if (Math.random() < (config.cursorPausePct ?? 0.35)) {
+        this.pauseTimer = 150 + Math.random() * 750;
+      }
     }
 
     const idx = Math.min(this.pathIdx, this.path.length - 2);
@@ -91,21 +90,16 @@ export class Cursor {
 
   draw(ctx, config) {
     if (!this.visible) return;
-    const s = config.cursorSize * this.clickScale;
+
+    const t = this.entranceDuration > 0 ? this.entranceTimer / this.entranceDuration : 1;
+    const opacity = Math.min(1, t * 1.4); // fade in faster than scale
+    const scale = easeOutBack(Math.min(1, t));
+    const s = config.cursorSize * Math.max(0.01, scale);
 
     ctx.save();
+    ctx.globalAlpha = opacity;
     ctx.translate(this.x, this.y);
 
-    // ripple
-    if (this.rippleOpacity > 0) {
-      ctx.beginPath();
-      ctx.arc(0, 0, this.rippleRadius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255,255,255,${this.rippleOpacity})`;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-    }
-
-    // arrow cursor (canvas path — classic northwest pointer)
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(0, s * 0.82);
@@ -131,21 +125,36 @@ export function buildCursorPath(particles, zones, axis) {
   const e = zones.end;
   const isH = axis === 'horizontal';
 
-  // entry: left edge (horizontal) or top edge (vertical)
-  const entryX = isH ? s.x1 - 60 : s.x1 + (s.x2 - s.x1) / 2;
-  const entryY = isH ? s.y1 + (s.y2 - s.y1) * 0.4 : s.y1 - 60;
-  const exitX  = isH ? e.x2 + 60 : s.x1 + (s.x2 - s.x1) / 2;
-  const exitY  = isH ? (s.y1 + s.y2) / 2 : e.y2 + 60;
+  // Canvas center — cursor appears here, then travels to the particle zone
+  const canvasCX = (s.x1 + e.x2) / 2;
+  const canvasCY = (s.y1 + e.y2) / 2;
 
-  const shuffled = [...particles].sort(() => Math.random() - 0.5);
-  const targets = shuffled.slice(0, Math.ceil(particles.length * 0.8));
-  targets.sort((a, b) => isH ? a.x - b.x : a.y - b.y);
+  const pool = [...particles].sort(() => Math.random() - 0.5)
+                             .slice(0, Math.ceil(particles.length * 0.8));
+
+  // Centroid of particle cloud — used as sweep anchor
+  const pcx = pool.reduce((acc, p) => acc + p.x, 0) / pool.length;
+  const pcy = pool.reduce((acc, p) => acc + p.y, 0) / pool.length;
+
+  const ordered = pool
+    .map(p => {
+      const dx = p.x - pcx;
+      const dy = p.y - pcy;
+      const r = Math.hypot(dx, dy);
+      const key = Math.atan2(dy, dx) + r * 0.005 + (Math.random() - 0.5) * 2.4;
+      return { p, key };
+    })
+    .sort((a, b) => a.key - b.key)
+    .map(({ p }) => p);
+
+  const exitX = isH ? e.x2 + 60 : canvasCX;
+  const exitY = isH ? canvasCY : e.y2 + 60;
 
   return [
-    { x: entryX, y: entryY },
-    ...targets.map(p => ({
-      x: p.x + (Math.random() - 0.5) * 6,
-      y: p.y + (Math.random() - 0.5) * 6,
+    { x: canvasCX, y: canvasCY },
+    ...ordered.map(p => ({
+      x: p.x + (Math.random() - 0.5) * 14,
+      y: p.y + (Math.random() - 0.5) * 14,
     })),
     { x: exitX, y: exitY },
   ];

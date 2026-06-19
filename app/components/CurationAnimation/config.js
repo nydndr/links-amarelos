@@ -1,21 +1,22 @@
 export const defaultConfig = {
-  totalCircles: 80,
-  clickedPct: 0.6,
+  totalCircles: 100,
+  clickedPct: 0.30,
   speed: 1,
   trailOpacity: 0.06,
   trailBlobRadius: 60,
   circleSizeMin: 5,
-  circleSizeMax: 18,
-  cursorSize: 28,
-  yellow: '#F5C842',
+  circleSizeMax: 10,
+  cursorSize: 20,
+  cursorPausePct: 0.9,
+  pad: 100,
+  yellow: '#ffcc00',
   purple: '#9B7FD4',
-  bgColor: '#0D0D0D',
+  bgColor: '#fde17c',
   circleFill: '#E8E8E8',
   circleStroke: '#888888',
+  // ms per stage at speed=1: idle, click, gather, settle, split, grid, frame, dissolve
+  stageDurations: [2000, 4500, 2500, 4000, 2500, 2000, 2500, 1500],
 };
-
-// ms per stage at speed=1; index 7 = loop dissolve
-export const STAGE_DURATIONS = [2000, 4500, 2500, 4000, 2500, 2000, 2500, 1500];
 
 export function hexToRgb(hex) {
   const h = hex.replace('#', '');

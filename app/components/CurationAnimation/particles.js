@@ -52,6 +52,8 @@ export class Particle {
 
     // fade for loop dissolve
     this.globalAlpha = 1;
+
+    this.willBeClicked = false;
   }
 
   triggerClick() {
@@ -88,32 +90,42 @@ export class Particle {
   updateMigrate(targetX, targetY, dt) {
     const dx = targetX - this.x;
     const dy = targetY - this.y;
-    this.vx += dx * 0.04;
-    this.vy += dy * 0.04;
-    this.vx += (Math.random() - 0.5) * 0.4;
-    this.vy += (Math.random() - 0.5) * 0.4;
-    this.vx *= 0.85;
-    this.vy *= 0.85;
+    this.vx += dx * 0.035;
+    this.vy += dy * 0.035;
+    this.vx += (Math.random() - 0.5) * 0.1;
+    this.vy += (Math.random() - 0.5) * 0.1;
+    this.vx *= 0.88;
+    this.vy *= 0.88;
     this.x += this.vx;
     this.y += this.vy;
   }
 
   updateSettle(dt) {
-    this.vx += (this.targetX - this.x) * 0.015;
-    this.vy += (this.targetY - this.y) * 0.015;
-    this.vx += (Math.random() - 0.5) * 0.2;
-    this.vy += (Math.random() - 0.5) * 0.2;
-    this.vx *= 0.9;
-    this.vy *= 0.9;
+    // Orbit gently around target — same feel as stage 0 but anchored to targetX/Y
+    this.orbitAngle += this.orbitSpeed;
+    const ox = this.targetX + Math.cos(this.orbitAngle) * (this.orbitRadius * 0.3);
+    const oy = this.targetY + Math.sin(this.orbitAngle) * (this.orbitRadius * 0.3);
+    this.vx += (ox - this.x) * 0.004;
+    this.vy += (oy - this.y) * 0.004;
+    this.vx += (Math.random() - 0.5) * 0.05;
+    this.vy += (Math.random() - 0.5) * 0.05;
+    this.vx *= 0.94;
+    this.vy *= 0.94;
     this.x += this.vx;
     this.y += this.vy;
   }
 
   updateGrid(dt) {
-    this.vx += (this.gridX - this.x) * 0.1;
-    this.vy += (this.gridY - this.y) * 0.1;
-    this.vx *= 0.75;
-    this.vy *= 0.75;
+    // Tiny slow orbit around grid pin
+    this.orbitAngle += this.orbitSpeed * 0.3;
+    const ox = this.gridX + Math.cos(this.orbitAngle) * (this.orbitRadius * 0.12);
+    const oy = this.gridY + Math.sin(this.orbitAngle) * (this.orbitRadius * 0.12);
+    this.vx += (ox - this.x) * 0.06;
+    this.vy += (oy - this.y) * 0.06;
+    this.vx += (Math.random() - 0.5) * 0.02;
+    this.vy += (Math.random() - 0.5) * 0.02;
+    this.vx *= 0.82;
+    this.vy *= 0.82;
     this.x += this.vx;
     this.y += this.vy;
   }
@@ -179,8 +191,9 @@ export class Particle {
 export function spawnParticles(count, zones, axis, config) {
   const types = ['solid', 'solid', 'outline', 'textured'];
   const particles = [];
-  const zone = zones.start;
   const { circleSizeMin, circleSizeMax } = config;
+
+  const zone = zones.start;
 
   for (let i = 0; i < count; i++) {
     const x = zone.x1 + Math.random() * (zone.x2 - zone.x1);
