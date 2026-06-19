@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Links Amarelos
 
-## Getting Started
+## Pre-launch polish
 
-First, run the development server:
+### Curation animation
+- [ ] Pause and restart controls (visible on hover or always-visible)
+- [ ] Replay on scroll re-entry (currently pauses; should restart from stage 0)
+- [ ] Mobile QA pass — vertical axis layout works in code but needs visual review on real devices
+- [ ] Label pills: check text overflow on small screens (`links + ondas` is long)
+- [ ] Consider a skip/jump button to let users advance to the next stage manually
+- [ ] Entrance animation for the whole section on first scroll-into-view
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Navigation
+- [ ] Mobile nav (hamburger or drawer — currently desktop only)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### SEO / meta
+- [ ] `og:image`, `og:title`, `og:description` for social sharing
+- [ ] Twitter card tags
+- [ ] Canonical URL
+- [ ] Favicon + Apple touch icon
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Pages
+- [ ] Custom 404 page
+- [ ] `/realizacoes` page content (linked in nav, destination unclear)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Performance
+- [ ] Lighthouse audit — LCP, CLS, TBT
+- [ ] Canvas animation: confirm no frame drops on low-end devices
+- [ ] Image optimization audit (cover art PNGs)
 
-## Learn More
+### Analytics
+- [ ] Add analytics (Plausible or Vercel Analytics)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Accessibility
+- [ ] Focus styles visible throughout
+- [ ] Screen-reader skip link to main content
+- [ ] Test with VoiceOver / NVDA
