@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import AutoTooltips from "./components/AutoTooltips";
 import LogoCarousel from "./components/LogoCarousel";
 import CurationAnimation from "./components/CurationAnimation";
@@ -108,9 +109,14 @@ export default function Home() {
               Junte-se aos canarinhos, aos ouros e aos fundadores
             </p>
             <p className="">planos mensais ou anuais e doações expontâneas</p>
-
-            <p></p>
           </div>
+
+          <Link
+            href="/apoio"
+            className="font-space-mono lowercase px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors text-sm"
+          >
+            ver planos
+          </Link>
         </div>
 
         <div className="flex flex-col items-center py-12 aspect-square space-y-12 bg-[url('/bg-texture-cutting-pad.svg')] bg-cover">
@@ -126,21 +132,31 @@ export default function Home() {
               o seu apoio ajuda a manter o conteúdo principal gratuito, a pintar
               o mundo de amarelo e muito mais...
             </p>
-
-            <p></p>
           </div>
+
+          <Link
+            href="/realizacoes"
+            className="font-space-mono lowercase px-6 py-3 border border-white/40 text-white rounded-full hover:bg-white/10 transition-colors text-sm"
+          >
+            ver realizações
+          </Link>
         </div>
       </section>
       <section className="grid grid-cols-2 border-y border-amber-200 py-20 font-manrope px-12">
         <div></div>
 
-        <div className="space-y-4 bg-red-200">
-          <p className="text-xl font-semibold tracking-tigther leading-snug">
+        <div className="space-y-4 text-amber-100">
+          <p className="text-xl font-semibold tracking-tight leading-snug">
             Os links amarelos são pesquisados, escritos, narrados, produzidos e
             editados por amarelo dandara.
           </p>
 
-          <p>Leia o manifesto amarelo</p>
+          <Link
+            href="/sobre#manifesto"
+            className="font-space-mono lowercase text-sm underline underline-offset-4 decoration-amber-300 hover:text-white transition-colors"
+          >
+            Leia o manifesto amarelo
+          </Link>
         </div>
       </section>
 

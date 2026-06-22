@@ -6,7 +6,7 @@
     fill="none"
 >
     <rect width="48" height="48" fill="#fafafa" opacity="0" />
-    <g opacity="0.15">
+    <g opacity="0.8">
         <path
             fill-rule="evenodd"
             clip-rule="evenodd"
