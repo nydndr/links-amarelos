@@ -2,8 +2,9 @@
 
 :root {
     --background: #ffffff;
-    --foreground: #171717;
+    --foreground: #442304;
     --amarelo: #ffcc00;
+    --amarelo-dark: #d19700;
 }
 
 @theme inline {
@@ -23,7 +24,41 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-@keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+.hb-line {
+    transform-box: stroke-box;
+    transform-origin: center;
+    /* close: spring overshoot — lines settle back with life */
+    transition:
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.25s ease 0.08s;
 }
+.hb-line.open {
+    /* open: expo ease-out — snappy response on click */
+    transition:
+        transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.15s ease;
+}
+.hb-top.open {
+    transform: translateY(var(--hb-gap)) rotate(45deg);
+}
+.hb-mid.open {
+    opacity: 0;
+}
+.hb-bot.open {
+    transform: translateY(calc(-1 * var(--hb-gap))) rotate(-45deg);
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.logo-marquee {
+    animation: marquee 20s linear infinite;
+    will-change: transform;
+}
+

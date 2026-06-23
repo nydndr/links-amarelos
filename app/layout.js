@@ -9,7 +9,7 @@ import {
 import "./globals.css";
 import AgentationWidget from "./agentation-widget";
 import LogoOdometer from "./components/LogoOdometer";
-
+import NavDrawer from "./components/NavDrawer";
 import Link from "next/link";
 
 const inter = Inter({
@@ -55,7 +55,7 @@ export default function RootLayout({ children }) {
       className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${unbounded.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <nav className="border-b border-(--amarelo) py-3 px-6 flex justify-between items-center">
+        <nav className="relative border-b border-(--amarelo) py-3 px-6 flex justify-between items-center">
           <Link href="/" className="text-(--amarelo)">
             <LogoOdometer />
           </Link>
@@ -63,7 +63,7 @@ export default function RootLayout({ children }) {
           <div className="flex gap-2 text-sm items-center">
             <Link
               href="https://amarelodandara.substack.com"
-              className="lowercase flex gap-2 items-center rounded-full px-3 py-1 bg-stone-400/10 border border-orange-400/50  text-orange-800"
+              className="lowercase flex gap-2 items-center rounded-full px-3 py-1 bg-stone-400/10 border border-orange-400/50  text-orange-600"
             >
               <div className="size-3">
                 <svg
@@ -111,6 +111,10 @@ export default function RootLayout({ children }) {
             >
               <p>Apoie</p>
             </Link>
+
+            <div className="w-px h-5 bg-(--amarelo) mx-1" />
+
+            <NavDrawer />
           </div>
         </nav>
         <div className="flex-1 bg-[url('/bg-texture.svg')] bg-repeat">

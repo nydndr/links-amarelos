@@ -1,27 +1,32 @@
 import OndasLogotype from "./icons/OndasLogotype";
 import LinksLogotype from "./icons/LinksLogotype";
 
+// 3 pairs per half → each half ~1248px, wider than any container
+const HALF = [
+  { Logo: OndasLogotype, w: "w-44" },
+  { Logo: LinksLogotype, w: "w-40" },
+  { Logo: OndasLogotype, w: "w-44" },
+  { Logo: LinksLogotype, w: "w-40" },
+  { Logo: OndasLogotype, w: "w-44" },
+  { Logo: LinksLogotype, w: "w-40" },
+];
+const TRACK = [...HALF, ...HALF];
+
 export default function LogoCarousel() {
   return (
-    <div className="overflow-hidden w-full">
-      <style>{`
-        @keyframes logo-marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-      `}</style>
-      <div
-        className="flex items-center"
-        style={{
-          width: "max-content",
-          animation: "logo-marquee 8s linear infinite",
-          willChange: "transform",
-        }}
-      >
-        <OndasLogotype className="w-44 h-fit shrink-0 mr-10" />
-        <LinksLogotype className="w-40 h-fit shrink-0 mr-10" />
-        <OndasLogotype className="w-44 h-fit shrink-0 mr-10" />
-        <LinksLogotype className="w-40 h-fit shrink-0 mr-10" />
+    <div
+      className="overflow-hidden w-full"
+      style={{
+        maskImage:
+          "linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)",
+      }}
+    >
+      <div className="flex items-center logo-marquee" style={{ width: "max-content" }}>
+        {TRACK.map(({ Logo, w }, i) => (
+          <Logo key={i} className={`${w} h-fit shrink-0 mr-10`} />
+        ))}
       </div>
     </div>
   );
