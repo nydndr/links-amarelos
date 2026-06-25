@@ -16,7 +16,7 @@ const LINKS = [
 ];
 
 const HOLD_MS = 800;
-const CIRCLE_R = 36;
+const CIRCLE_R = 12;
 const SETTLE_SPEED = 0.5;
 const SETTLE_FRAMES = 80;
 
@@ -51,7 +51,7 @@ export default function ExperimenteSection() {
   const circlesRef = useRef([]);
   const settledCirclesRef = useRef([]);
   const engineRef = useRef(null);
-  const trailCmdRef = useRef(null);     // 'dismiss' | null
+  const trailCmdRef = useRef(null); // 'dismiss' | null
   const isBtnHoveredRef = useRef(false);
 
   // Physics setup

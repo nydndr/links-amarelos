@@ -16,6 +16,7 @@
     --font-manrope: var(--font-manrope);
     --font-unbounded: var(--font-unbounded);
     --font-space-mono: var(--font-space-mono);
+    --font-redacted: var(--font-redacted);
 }
 
 body {

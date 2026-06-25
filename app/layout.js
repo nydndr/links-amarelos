@@ -5,6 +5,7 @@ import {
   Manrope,
   Unbounded,
   Space_Mono,
+  Redacted,
 } from "next/font/google";
 import "./globals.css";
 import AgentationWidget from "./agentation-widget";
@@ -43,6 +44,12 @@ const spaceMono = Space_Mono({
   weight: ["400", "700"],
 });
 
+const redacted = Redacted({
+  variable: "--font-redacted",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export const metadata = {
   title: "Links Amarelos",
   description: "Links Amarelos",
@@ -52,7 +59,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${unbounded.variable} ${spaceMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${unbounded.variable} ${spaceMono.variable} ${redacted.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <nav className="relative border-b border-(--amarelo) py-3 px-6 flex justify-between items-center">
@@ -63,7 +70,7 @@ export default function RootLayout({ children }) {
           <div className="flex gap-2 text-sm items-center">
             <Link
               href="https://amarelodandara.substack.com"
-              className="lowercase flex gap-2 items-center rounded-full px-3 py-1 bg-stone-400/10 border border-orange-400/50  text-orange-600"
+              className="hidden md:flex lowercase gap-2 items-center rounded-full px-3 py-1 bg-stone-400/10 border border-orange-400/50  text-orange-600"
             >
               <div className="size-3">
                 <svg
@@ -85,7 +92,7 @@ export default function RootLayout({ children }) {
             </Link>
             <Link
               href="https://open.spotify.com/show/043Gs7eyY2KOlotEWSTSxB?si=e7abf2b9730747d7"
-              className="lowercase flex gap-2 items-center rounded-full px-3 py-1 bg-stone-400/10 border border-green-400/50  text-green-800"
+              className="hidden md:flex gap-2 items-center rounded-full px-3 py-1 bg-stone-400/10 border border-green-400/50  text-green-800"
             >
               <div className="size-4 flex">
                 <svg
@@ -112,7 +119,7 @@ export default function RootLayout({ children }) {
               <p>Apoie</p>
             </Link>
 
-            <div className="w-px h-5 bg-(--amarelo) mx-1" />
+            <div className="hidden md:block w-px h-5 bg-(--amarelo) mx-1" />
 
             <NavDrawer />
           </div>

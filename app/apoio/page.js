@@ -100,7 +100,7 @@ export default function ApoioPage() {
         <p className="lowercase rounded-full text-xs font-space-mono px-2 py-0.5 bg-white/10 border border-white/50 text-white w-fit">
           apoio
         </p>
-        <h1 className="font-unbounded text-4xl md:text-6xl text-amber-50 tracking-tight leading-tight">
+        <h1 className="font-unbounded text-4xl md:text-6xl text-amber-100 tracking-tight leading-tight">
           Junte-se aos<br />canarinhos
         </h1>
         <p className="font-manrope text-xl text-amber-100 max-w-lg leading-relaxed">
@@ -120,7 +120,7 @@ export default function ApoioPage() {
               {/* Badge + nome */}
               <div className="space-y-3">
                 <span
-                  className={`rounded-full text-xs font-space-mono px-2 py-0.5 border ${plano.style.badge} w-fit`}
+                  className={`lowercase rounded-full text-xs font-space-mono px-2 py-0.5 border ${plano.style.badge} w-fit`}
                 >
                   {plano.id}
                 </span>
@@ -186,15 +186,15 @@ export default function ApoioPage() {
         </div>
         <Link
           href="https://amarelodandara.substack.com"
-          className="font-space-mono lowercase px-6 py-3 border border-amber-200 rounded-full text-amber-100 hover:bg-white/10 transition-colors shrink-0"
+          className="font-space-mono lowercase px-6 py-3 border border-white/40 rounded-full text-white hover:bg-white/10 transition-colors shrink-0"
         >
           fazer uma doação
         </Link>
       </section>
 
       {/* Por que apoiar */}
-      <section className="px-8 py-16 space-y-8">
-        <p className="uppercase text-xs text-amber-200 font-unbounded tracking-widest">
+      <section className="border-b border-amber-200 px-8 py-16 space-y-8">
+        <p className="uppercase text-sm text-amber-100 px-4 font-unbounded">
           Por que apoiar
         </p>
         <div className="grid md:grid-cols-3 gap-8">

@@ -59,7 +59,7 @@ export default function RealizacoesPage() {
         <p className="lowercase rounded-full text-xs font-space-mono px-2 py-0.5 bg-white/10 border border-white/50 text-white w-fit">
           realizações
         </p>
-        <h1 className="font-unbounded text-4xl md:text-6xl text-amber-50 tracking-tight leading-tight">
+        <h1 className="font-unbounded text-4xl md:text-6xl text-amber-100 tracking-tight leading-tight">
           O que nasce daqui
         </h1>
         <p className="font-manrope text-xl text-amber-100 max-w-lg leading-relaxed">
@@ -70,11 +70,11 @@ export default function RealizacoesPage() {
       </section>
 
       {/* Cards */}
-      <section className="divide-y divide-amber-200">
+      <section className="border-y border-amber-200 divide-y divide-amber-200">
         {realizacoes.map((r) => (
           <div
             key={r.slug}
-            className={`${r.texture} bg-repeat border-b border-amber-200`}
+            className={`${r.texture} bg-repeat group`}
           >
             <div className="px-8 py-12 flex flex-col md:flex-row gap-8 items-start">
               {/* Cover art */}
@@ -85,7 +85,7 @@ export default function RealizacoesPage() {
                     width={400}
                     height={400}
                     alt={r.name}
-                    className="size-28 aspect-square rounded-sm outline outline-2 outline-white/30 rotate-1"
+                    className="size-28 aspect-square rounded-sm outline outline-2 outline-amber-200 rotate-1 transition-transform duration-200 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110 group-hover:-translate-y-1"
                   />
                 </div>
               )}
@@ -102,7 +102,7 @@ export default function RealizacoesPage() {
               <div className="space-y-4 flex-1">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`rounded-full text-xs font-space-mono px-2 py-0.5 border ${r.badgeStyle}`}
+                    className={`lowercase rounded-full text-xs font-space-mono px-2 py-0.5 border ${r.badgeStyle}`}
                   >
                     {r.label}
                   </span>
@@ -133,7 +133,7 @@ export default function RealizacoesPage() {
       </section>
 
       {/* Support CTA */}
-      <section className="px-8 py-16 space-y-4 text-center">
+      <section className="border-t border-amber-200 px-8 py-16 space-y-4 text-center">
         <p className="font-manrope text-xl font-semibold text-amber-100 tracking-tight">
           Essas realizações vivem do seu apoio.
         </p>
@@ -144,7 +144,7 @@ export default function RealizacoesPage() {
         <div className="pt-4">
           <Link
             href="/apoio"
-            className="font-space-mono lowercase px-8 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors text-lg"
+            className="font-space-mono lowercase px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors text-sm"
           >
             ver planos de apoio
           </Link>
