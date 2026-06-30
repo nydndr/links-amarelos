@@ -1,37 +1,49 @@
 # Links Amarelos
 
-## Pre-launch polish
+Personal website for Links Amarelos — showcasing curation work, releases, and ways to support the project.
 
-### Curation animation
-- [ ] Pause and restart controls (visible on hover or always-visible)
-- [ ] Replay on scroll re-entry (currently pauses; should restart from stage 0)
-- [ ] Mobile QA pass — vertical axis layout works in code but needs visual review on real devices
-- [ ] Label pills: check text overflow on small screens (`links + ondas` is long)
-- [ ] Consider a skip/jump button to let users advance to the next stage manually
-- [ ] Entrance animation for the whole section on first scroll-into-view
+## Stack
 
-### Navigation
-- [ ] Mobile nav (hamburger or drawer — currently desktop only)
+- **Next.js 16** (App Router) · React 19 · JavaScript
+- **Tailwind CSS v4** via PostCSS
+- **matter-js** for physics-based UI interactions
+- **react-type-animation** for text animations
 
-### SEO / meta
-- [ ] `og:image`, `og:title`, `og:description` for social sharing
-- [ ] Twitter card tags
-- [ ] Canonical URL
-- [ ] Favicon + Apple touch icon
+## Getting started
 
-### Pages
-- [ ] Custom 404 page
-- [ ] `/realizacoes` page content (linked in nav, destination unclear)
+```bash
+npm install
+npm run dev       # http://localhost:3000
+```
 
-### Performance
-- [ ] Lighthouse audit — LCP, CLS, TBT
-- [ ] Canvas animation: confirm no frame drops on low-end devices
-- [ ] Image optimization audit (cover art PNGs)
+## Commands
 
-### Analytics
-- [ ] Add analytics (Plausible or Vercel Analytics)
+```bash
+npm run dev       # development server with hot reload
+npm run build     # production build
+npm run start     # serve production build locally
+npm run lint      # run ESLint
+```
 
-### Accessibility
-- [ ] Focus styles visible throughout
-- [ ] Screen-reader skip link to main content
-- [ ] Test with VoiceOver / NVDA
+## Project structure
+
+```
+app/
+├── layout.js           # root layout — Geist fonts, nav
+├── page.js             # home page
+├── sobre/              # about page
+├── realizacoes/        # releases / achievements page
+├── apoio/              # support page
+└── components/
+    ├── CurationAnimation/  # multi-stage scroll-driven animation
+    └── icons/
+```
+
+## Contributing
+
+1. Fork the repo and create a branch from `main`
+2. Run `npm run dev` and confirm your changes work locally
+3. Run `npm run lint` — fix any errors before opening a PR
+4. Open a pull request with a clear description of what changed and why
+
+No TypeScript, no test suite — keep PRs focused and small.

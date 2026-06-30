@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# editor / agent tool configs
+.cursor/
+.gemini/
+.codex/
+.zed/
+.vscode/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
