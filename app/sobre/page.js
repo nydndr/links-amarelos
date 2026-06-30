@@ -155,14 +155,14 @@ export default function SobrePage() {
                 cortar e viralizar, aqui eu vou me preocupar com respirar fundo,
                 com rolar até o fim da página e priorizar a mensagem. Isso
                 envolve contar a mensagem na mídia que ela precisa e não na mais
-                rápida, contar com calma e mostrar as fontes.
+                rápida, contar com calma e contar com fontes.
               </p>
               <p>
                 Essa profundidade vai ser feita com otimismo. É fácil achar o
                 lado ruim das coisas, é mais fácil ainda se beneficiar dele. É
                 muito mais difícil discutir pontos que não explodiram em
                 vermelho essa semana, mas que ninguém vai se lembrar semana que
-                vem. Felizmente os links são amarelos, não vermelhos ou ao menos
+                vem. Felizmente os links são amarelos, não vermelhos ou sequer
                 laranjas.
               </p>
             </div>

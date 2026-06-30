@@ -127,6 +127,74 @@ export default function RootLayout({ children }) {
         <div className="flex-1 bg-[url('/bg-texture.svg')] bg-repeat">
           {children}
         </div>
+
+        <footer className="border-t border-(--amarelo) bg-[url('/bg-texture.svg')] bg-repeat">
+          <div className="max-w-4xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+            {/* Brand */}
+            <div className="space-y-3">
+              <p className="font-unbounded text-sm text-(--amarelo-dark) tracking-tight">
+                links amarelos
+              </p>
+              <p className="font-manrope text-sm text-stone-500 leading-relaxed">
+                Curadoria semanal de links que valem seu tempo. Feito por amarelo dandara.
+              </p>
+            </div>
+
+            {/* Pages */}
+            <div className="space-y-3">
+              <p className="font-space-mono text-xs text-stone-400 uppercase tracking-widest">
+                Páginas
+              </p>
+              <nav className="flex flex-col gap-2">
+                {[
+                  { href: "/sobre", label: "Sobre" },
+                  { href: "/realizacoes", label: "Realizações" },
+                  { href: "/apoio", label: "Apoio" },
+                ].map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="font-manrope text-sm text-stone-600 hover:text-(--amarelo-dark) transition-colors lowercase"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            {/* Socials */}
+            <div className="space-y-3">
+              <p className="font-space-mono text-xs text-stone-400 uppercase tracking-widest">
+                Leia e ouça
+              </p>
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="https://amarelodandara.substack.com"
+                  className="font-manrope text-sm text-stone-600 hover:text-orange-600 transition-colors lowercase"
+                >
+                  Newsletter no Substack →
+                </Link>
+                <Link
+                  href="https://open.spotify.com/show/043Gs7eyY2KOlotEWSTSxB?si=e7abf2b9730747d7"
+                  className="font-manrope text-sm text-stone-600 hover:text-green-700 transition-colors lowercase"
+                >
+                  Ondas Amarelas no Spotify →
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="border-t border-(--amarelo)/30 px-6 py-4 max-w-4xl mx-auto flex justify-between items-center">
+            <p className="font-space-mono text-xs text-stone-400 lowercase">
+              © {new Date().getFullYear()} links amarelos
+            </p>
+            <p className="font-space-mono text-xs text-stone-400 lowercase">
+              feito com cuidado
+            </p>
+          </div>
+        </footer>
+
         <AgentationWidget />
       </body>
     </html>

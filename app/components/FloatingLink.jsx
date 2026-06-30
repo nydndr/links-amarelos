@@ -80,9 +80,9 @@ export default function FloatingLink({ title, url }) {
         tx = targetRef.current.x;
         ty = targetRef.current.y;
       } else {
-        // Lissajous idle drift
-        tx = w / 2 + Math.sin(elapsed * FLOAT_SPEED) * FLOAT_AMP;
-        ty = h / 2 + Math.cos(elapsed * FLOAT_SPEED * 0.71) * FLOAT_AMP;
+        // Lissajous idle drift across full section
+        tx = w / 2 + Math.sin(elapsed * FLOAT_SPEED) * (w / 2 - R - 16);
+        ty = h / 2 + Math.cos(elapsed * FLOAT_SPEED * 0.71) * (h / 2 - R - 16);
       }
 
       let { x, y } = posRef.current;
