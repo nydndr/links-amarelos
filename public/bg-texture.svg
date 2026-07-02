@@ -5,8 +5,8 @@
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
 >
-    <rect width="48" height="48" fill="#fafafa" opacity="0" />
-    <g opacity="0.8">
+    <rect width="48" height="48" fill="#fff1b9" opacity="1" />
+    <g opacity="0.3">
         <path
             fill-rule="evenodd"
             clip-rule="evenodd"
