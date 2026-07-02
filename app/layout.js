@@ -132,9 +132,9 @@ export default function RootLayout({ children }) {
           <div className="max-w-4xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
             {/* Brand */}
             <div className="space-y-3">
-              <p className="font-unbounded text-sm text-(--amarelo-dark) tracking-tight">
-                links amarelos
-              </p>
+              <Link href="/" className="inline-block text-(--amarelo-dark)">
+                <LogoOdometer heightRem={0.7} />
+              </Link>
               <p className="font-manrope text-sm text-stone-500 leading-relaxed">
                 Curadoria semanal de links que valem seu tempo. Feito por amarelo dandara.
               </p>

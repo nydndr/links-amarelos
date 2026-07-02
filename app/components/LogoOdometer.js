@@ -10,7 +10,7 @@ const STEP_INTERVAL = 3000;  // between each logo in a cycle
 const REST_INTERVAL = 60000; // pause between cycles
 const ANIM_MS = 600;
 
-export default function LogoOdometer() {
+export default function LogoOdometer({ heightRem = 1.25, className = '' }) {
   const [stripIdx, setStripIdx] = useState(3);
   const [withTransition, setWithTransition] = useState(true);
   const stepRef = useRef(0);
@@ -73,24 +73,26 @@ export default function LogoOdometer() {
     startCycle();
   }
 
+  const itemStyle = { height: `${heightRem}rem` };
+
   return (
     <div
-      className="h-5 overflow-hidden cursor-pointer"
-      style={{ minWidth: '160px' }}
+      className={`overflow-hidden cursor-pointer ${className}`}
+      style={{ height: `${heightRem}rem`, minWidth: `${160 * (heightRem / 1.25)}px` }}
       onMouseEnter={handleMouseEnter}
     >
       <div
         style={{
-          transform: `translateY(${-(stripIdx * 1.25)}rem)`,
+          transform: `translateY(${-(stripIdx * heightRem)}rem)`,
           transition: withTransition
             ? `transform ${ANIM_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`
             : 'none',
         }}
       >
-        <div className="h-5 flex items-center"><LinksLogotype className="h-5 w-auto" /></div>
-        <div className="h-5 flex items-center"><OndasLogotype className="h-5 w-auto" /></div>
-        <div className="h-5 flex items-center"><HyperlinksLogo className="h-5 w-auto" /></div>
-        <div className="h-5 flex items-center"><LinksLogotype className="h-5 w-auto" /></div>
+        <div className="flex items-center" style={itemStyle}><LinksLogotype className="w-auto" style={itemStyle} /></div>
+        <div className="flex items-center" style={itemStyle}><OndasLogotype className="w-auto" style={itemStyle} /></div>
+        <div className="flex items-center" style={itemStyle}><HyperlinksLogo className="w-auto" style={itemStyle} /></div>
+        <div className="flex items-center" style={itemStyle}><LinksLogotype className="w-auto" style={itemStyle} /></div>
       </div>
     </div>
   );
