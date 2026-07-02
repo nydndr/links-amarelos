@@ -6,6 +6,8 @@ import CurationAnimation from "./components/CurationAnimation";
 import ExperimenteSection from "./components/ExperimenteSection";
 import CountdownOdometer from "./components/CountdownOdometer";
 import FloatingLink from "./components/FloatingLink";
+import ExternalLinkPill from "./components/ExternalLinkPill";
+import Button from "./components/Button";
 
 export default function Home() {
     return (
@@ -101,12 +103,9 @@ export default function Home() {
                             </p>
                         </div>
 
-                        <Link
-                            href="/realizacoes"
-                            className="font-space-mono lowercase px-6 py-3 border border-white/40 text-white rounded-full hover:bg-white/10 transition-colors text-sm"
-                        >
+                        <Button variant="secondary" href="/realizacoes" className="text-sm">
                             ver realizações
-                        </Link>
+                        </Button>
                     </div>
 
                     <div className="flex flex-col items-center py-16 md:aspect-square justify-around bg-blue-500 text-white">
@@ -129,17 +128,14 @@ export default function Home() {
                             </p>
                         </div>
 
-                        <Link
-                            href="/apoio"
-                            className="font-space-mono lowercase px-6 py-3 bg-white text-blue-500 rounded-full hover:bg-blue-600 transition-colors text-sm"
-                        >
+                        <Button variant="primary-inverted" href="/apoio" className="text-sm">
                             ver planos
-                        </Link>
+                        </Button>
                     </div>
                 </section>
 
                 <section className="grid grid-cols-1 md:grid-cols-2 border-y border-amber-200 divide-y md:divide-y-0 md:divide-x-2 divide-amber-200">
-                    <div className="flex flex-col items-center py-16 md:aspect-square justify-around">
+                    <div className="flex flex-col items-center py-16 md:aspect-square justify-around bg-amber-200">
                         <p className="lowercase rounded-full text-xs font-space-mono px-2 py-0.5 bg-white/10 border border-white/50  text-white w-fit mx-auto">
                             última edição
                         </p>
@@ -177,51 +173,16 @@ export default function Home() {
                         </div>
 
                         <div className="flex gap-2">
-                            <Link
+                            <ExternalLinkPill
+                                platform="substack"
                                 href="https://amarelodandara.substack.com"
-                                className="hidden md:flex lowercase gap-2 items-center rounded-full px-3 py-1 bg-white/20 border border-orange-400/50  text-orange-600"
-                            >
-                                <div className="size-3">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        shapeRendering="geometricPrecision"
-                                        textRendering="geometricPrecision"
-                                        imageRendering="optimizeQuality"
-                                        fillRule="evenodd"
-                                        clipRule="evenodd"
-                                        viewBox="0 0 448 511.471"
-                                    >
-                                        <path
-                                            fill="#FF681A"
-                                            d="M0 0h448v62.804H0V0zm0 229.083h448v282.388L223.954 385.808 0 511.471V229.083zm0-114.542h448v62.804H0v-62.804z"
-                                        />
-                                    </svg>
-                                </div>
-                                <p className="font-space-mono">Leia</p>
-                            </Link>
-
-                            <Link
+                                className="hidden md:flex bg-white/20"
+                            />
+                            <ExternalLinkPill
+                                platform="spotify"
                                 href="https://open.spotify.com/show/043Gs7eyY2KOlotEWSTSxB?si=e7abf2b9730747d7"
-                                className="hidden md:flex gap-2 items-center rounded-full px-3 py-1 bg-white/20 border border-green-400/50  text-green-800 lowercase"
-                            >
-                                <div className="size-4 flex">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        shapeRendering="geometricPrecision"
-                                        textRendering="geometricPrecision"
-                                        imageRendering="optimizeQuality"
-                                        fillRule="evenodd"
-                                        clipRule="evenodd"
-                                        viewBox="0 0 64 64"
-                                    >
-                                        <path
-                                            d="M32 0C14.3 0 0 14.337 0 32c0 17.7 14.337 32 32 32 17.7 0 32-14.337 32-32S49.663 0 32 0zm14.68 46.184c-.573.956-1.797 1.223-2.753.65-7.532-4.588-16.975-5.62-28.14-3.097-1.07.23-2.14-.42-2.37-1.49s.42-2.14 1.49-2.37c12.196-2.79 22.67-1.606 31.082 3.556a2 2 0 0 1 .688 2.753zm3.9-8.717c-.726 1.185-2.256 1.53-3.44.84-8.602-5.276-21.716-6.805-31.885-3.747-1.338.382-2.714-.344-3.097-1.644-.382-1.338.344-2.714 1.682-3.097 11.622-3.517 26.074-1.835 35.976 4.244 1.147.688 1.49 2.217.765 3.403zm.344-9.1c-10.323-6.117-27.336-6.69-37.2-3.708-1.568.497-3.25-.42-3.747-1.988s.42-3.25 1.988-3.747c11.317-3.44 30.127-2.753 41.98 4.282 1.415.84 1.873 2.676 1.032 4.09-.765 1.453-2.638 1.912-4.053 1.07z"
-                                            fill="#1ed760"
-                                        />
-                                    </svg>
-                                </div>
-                                <p className="font-space-mono">Ouça</p>
-                            </Link>
+                                className="hidden md:flex bg-white/20"
+                            />
                         </div>
                     </div>
 

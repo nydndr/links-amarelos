@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Button from "../components/Button";
 
 export default function PlansToggle() {
   const [anual, setAnual] = useState(false);
@@ -33,12 +33,13 @@ export default function PlansToggle() {
               <span>ondas amarelas</span> a curadoria mensal que você ouve
             </li>
           </ul>
-          <Link
+          <Button
+            variant="secondary"
             href="https://amarelodandara.substack.com"
-            className="font-space-mono lowercase text-sm text-center px-5 py-3 rounded-full border transition-colors"
+            className="text-sm text-center"
           >
             Assinar grátis
-          </Link>
+          </Button>
         </div>
       </div>
 
@@ -90,12 +91,13 @@ export default function PlansToggle() {
               amarelissímos
             </li>
           </ul>
-          <Link
+          <Button
+            variant="secondary"
             href="https://amarelodandara.substack.com"
-            className="font-space-mono lowercase text-sm text-center px-5 py-3 rounded-full border transition-colors"
+            className="text-sm text-center"
           >
             {anual ? "Assinar por R$ 90/ano" : "Assinar por R$ 10/mês"}
-          </Link>
+          </Button>
         </div>
       </div>
     </section>

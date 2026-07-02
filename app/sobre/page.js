@@ -1,13 +1,23 @@
-import Link from "next/link";
 import LinksLogotype from "../components/icons/LinksLogotype";
 import OndasLogotype from "../components/icons/OndasLogotype";
 import HyperlinksLogo from "../components/icons/HyperlinksLogo";
 import Timeline from "../components/Timeline";
 import TypingCycler from "../components/TypingCycler";
+import Button from "../components/Button";
 
 export const metadata = {
-  title: "Sobre — Links Amarelos",
+  title: "sobre",
   description: "O que é Links Amarelos e quem está por trás.",
+  alternates: { canonical: "/sobre" },
+  openGraph: {
+    title: "sobre • links amarelos",
+    description: "O que é Links Amarelos e quem está por trás.",
+    url: "/sobre",
+  },
+  twitter: {
+    title: "sobre • links amarelos",
+    description: "O que é Links Amarelos e quem está por trás.",
+  },
 };
 
 const timeline = [
@@ -279,18 +289,12 @@ export default function SobrePage() {
           </p>
         </div>
         <div className="flex gap-3 flex-wrap">
-          <Link
-            href="https://amarelodandara.substack.com"
-            className="font-space-mono lowercase px-6 py-3 border border-amber-200 rounded-full text-amber-100 hover:bg-white/10 transition-colors"
-          >
+          <Button variant="secondary" href="https://amarelodandara.substack.com">
             assinar grátis
-          </Link>
-          <Link
-            href="/apoio"
-            className="font-space-mono lowercase px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-          >
+          </Button>
+          <Button variant="primary" href="/apoio">
             apoiar o projeto
-          </Link>
+          </Button>
         </div>
       </section>
     </main>

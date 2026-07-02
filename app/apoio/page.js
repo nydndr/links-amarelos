@@ -1,9 +1,19 @@
-import Link from "next/link";
 import PlansToggle from "./PlansToggle";
+import Button from "../components/Button";
 
 export const metadata = {
-  title: "Apoio — Links Amarelos",
+  title: "apoio",
   description: "Apoie Links Amarelos e ajude a manter a curadoria viva.",
+  alternates: { canonical: "/apoio" },
+  openGraph: {
+    title: "apoio • links amarelos",
+    description: "Apoie Links Amarelos e ajude a manter a curadoria viva.",
+    url: "/apoio",
+  },
+  twitter: {
+    title: "apoio • links amarelos",
+    description: "Apoie Links Amarelos e ajude a manter a curadoria viva.",
+  },
 };
 
 export default function ApoioPage() {
@@ -54,12 +64,9 @@ export default function ApoioPage() {
             </li>
           </ul>
         </div>
-        <Link
-          href="https://amarelodandara.substack.com"
-          className="font-space-mono lowercase px-6 py-3 border border-white/40 rounded-full text-white hover:bg-white/10 transition-colors shrink-0"
-        >
+        <Button variant="secondary" href="https://amarelodandara.substack.com" className="shrink-0">
           fazer uma doação
-        </Link>
+        </Button>
       </section>
 
       {/* Por que apoiar */}

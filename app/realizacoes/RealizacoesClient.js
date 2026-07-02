@@ -3,116 +3,39 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-
-const principios = [
-  {
-    id: "profundo-otimista",
-    numero: "01",
-    nome: "Profundo e Otimista",
-    explainer:
-      "Conteúdo escrito com calma e profundidade, otimista sobre a vida e sobre o seu span de atenção.",
-    realizacoes: [
-      {
-        slug: "links-amarelos",
-        status: "ativa",
-        name: "Links Amarelos",
-        description:
-          "A curadoria mensal dos creme de la creme da internet. Artigos, vídeos, músicas, imagens, ferramentas e buracos negros digitais — curados à mão.",
-        cta: "Assinar",
-        href: "https://amarelodandara.substack.com",
-        cover: "/brand/links-amarelos-3.png",
-      },
-      {
-        slug: "ondas-amarelas",
-        status: "ativa",
-        name: "Ondas Amarelas",
-        description:
-          "A versão em áudio expandida dos links amarelos. O mesmo conteúdo, mas com um tempero a mais que pode morar no rádio do seu carro ou no seu fone de ouvido.",
-        cta: "Ouvir",
-        href: "https://open.spotify.com/show/043Gs7eyY2KOlotEWSTSxB?si=e7abf2b9730747d7",
-        cover: "/brand/ondas-amarelas-6.png",
-      },
-      {
-        slug: "hyperlinks",
-        status: "construindo",
-        name: "Hyperlinks Amarelos",
-        description:
-          "Ensaios sobre assuntos específicos formados por muitos links amarelos demais para caber em uma issue ou outra.",
-        cta: "Ouvir",
-        href: null,
-        cover: "/brand/coming-newsletter.png",
-      },
-    ],
-  },
-  {
-    id: "presente-multimidia",
-    numero: "02",
-    nome: "Presente e Multimídia",
-    explainer:
-      "Formatos que vão além do texto e realizações que vão além da internet.",
-    realizacoes: [
-      {
-        slug: "hyperlinks",
-        status: "planejada",
-        name: "Hyperlinks Amarelos",
-        description:
-          "Quando um link extrapola os limites de uma newsletter, ele ganha um espaço dedicado em forma de ensaio por áudio.",
-        cta: null,
-        href: null,
-        cover: null,
-      },
-    ],
-  },
-  {
-    id: "auto-sustentavel",
-    numero: "03",
-    nome: "Auto-sustentável e Expansivo",
-    explainer:
-      "Projetos que se financiam e crescem com a comunidade que os sustenta.",
-    realizacoes: [
-      {
-        slug: "arquivo",
-        status: "planejada",
-        name: "Arquivo Amarelo",
-        description:
-          "Todo link já compartilhado em Links Amarelos, organizado, pesquisável e anotado. Um acervo vivo de descobertas.",
-        cta: null,
-        href: null,
-        cover: null,
-      },
-    ],
-  },
-  {
-    id: "apoiado-apoiador",
-    numero: "04",
-    nome: "Apoiado e Apoiador",
-    explainer: "Uma rede de apoio mútuo entre criadores e leitores.",
-    realizacoes: [],
-  },
-];
+import YellowCircle from "../components/YellowCircle";
+import Button from "../components/Button";
 
 const statusStyles = {
-  ativa: "bg-emerald-100 border-emerald-300 text-emerald-700",
-  construindo: "bg-sky-100 border-sky-300 text-sky-700",
-  realizada: "bg-violet-100 border-violet-300 text-violet-700",
-  planejada: "bg-amber-100/60 border-dashed border-amber-400/60 text-amber-500",
+  ativa: "",
+  construindo: "",
+  realizada: "",
+  planejada: "",
 };
 
-function RealizacaoCard({ r }) {
+function StatusPill({ status }) {
   return (
-    <div className="relative py-12 px-6 aspect-square flex flex-col justify-between">
-      <span
-        className={`absolute top-4 right-4 lowercase rounded-full text-xs font-space-mono px-2 py-0.5 border ${statusStyles[r.status] ?? statusStyles.planejada}`}
-      >
-        {r.status}
-      </span>
+    <span className={`a ${statusStyles[status] ?? statusStyles.planejada}`}>
+      {status}
+    </span>
+  );
+}
 
-      {r.cover ? (
+function RealizacaoCard({ status, name, cover, cta, href, children }) {
+  return (
+    <div className="">
+      <StatusPill status={status} />
+
+      {status === "construindo" ? (
+        <YellowCircle filled className="size-30 shrink-0" />
+      ) : status === "planejada" ? (
+        <YellowCircle className="size-30 shrink-0" />
+      ) : cover ? (
         <Image
-          src={r.cover}
+          src={cover}
           width={400}
           height={400}
-          alt={r.name}
+          alt={name}
           className="size-30 aspect-square rounded-sm outline outline-2 outline-amber-300 rotate-1 shrink-0 transition-transform duration-200 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110 group-hover:-translate-y-1"
         />
       ) : (
@@ -124,20 +47,16 @@ function RealizacaoCard({ r }) {
       )}
 
       <div className="flex-1 min-w-0">
-        <div>
-          <h3 className="font-unbounded text-base tracking-tight text-amber-900 leading-tight">
-            {r.name}
-          </h3>
-        </div>
-        <p className="font-manrope text-sm text-amber-800 leading-relaxed mt-1">
-          {r.description}
-        </p>
-        {r.cta && r.href && (
+        <h3 className="font-unbounded text-base tracking-tight text-amber-900 leading-tight">
+          {name}
+        </h3>
+        {children}
+        {cta && href && (
           <Link
-            href={r.href}
+            href={href}
             className="font-space-mono lowercase text-xs mt-2 inline-block text-blue-600 hover:text-blue-800 transition-colors"
           >
-            {r.cta} →
+            {cta} →
           </Link>
         )}
       </div>
@@ -145,13 +64,13 @@ function RealizacaoCard({ r }) {
   );
 }
 
-function Accordion({ principio }) {
+function Accordion({ numero, nome, explainer, children }) {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const hasContent = principio.realizacoes.length > 0;
+  const hasContent = Boolean(children);
 
   return (
-    <div className="border-b border-amber-300">
+    <div className="">
       <button
         onClick={() => setOpen((v) => !v)}
         onMouseEnter={() => setHovered(true)}
@@ -163,15 +82,15 @@ function Accordion({ principio }) {
           className={`absolute inset-0 bg-[url('/bg-texture-cutting-pad.svg')] bg-cover pointer-events-none transition-opacity duration-300 ${hovered && !open ? "opacity-100" : "opacity-0"}`}
         />
         <span className="relative font-space-mono text-xs text-(--amarelo) shrink-0 w-6 mt-1">
-          {principio.numero}
+          {numero}
         </span>
 
         <div className="relative flex-1 flex flex-col">
           <h2 className="font-unbounded text-3xl md:text-4xl lg:text-5xl tracking-tight text-amber-900 leading-none">
-            {principio.nome}
+            {nome}
           </h2>
           <p className="font-manrope text-sm text-amber-700 mt-2 leading-snug">
-            {principio.explainer}
+            {explainer}
           </p>
         </div>
 
@@ -187,10 +106,8 @@ function Accordion({ principio }) {
       >
         <div className="border-t border-(--amarelo)/40">
           {hasContent ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-(--amarelo)/40">
-              {principio.realizacoes.map((r) => (
-                <RealizacaoCard key={r.slug} r={r} />
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y divide-x divide-(--amarelo)/40">
+              {children}
             </div>
           ) : (
             <p className="font-space-mono text-sm text-amber-600 lowercase py-4 px-6">
@@ -203,7 +120,7 @@ function Accordion({ principio }) {
   );
 }
 
-export default function RealizacoesPage() {
+export default function RealizacoesClient() {
   return (
     <main className="min-h-screen bg-(--amarelo) w-full md:max-w-4xl md:mx-auto">
       {/* Header */}
@@ -212,25 +129,94 @@ export default function RealizacoesPage() {
           realizações
         </p>
         <h1 className="font-unbounded text-4xl md:text-6xl text-amber-100 tracking-tight leading-tight">
-          O que nasce daqui
+          O que nasce dos
+          <br />
+          links amarelos
         </h1>
         <p className="font-manrope text-xl text-amber-100 max-w-lg leading-relaxed">
-          Links Amarelos é a semente. As realizações são tudo que cresce a
-          partir dela — organizadas pelos quatro princípios do manifesto.
+          Os links amarelos são a semente. As realizações são tudo que nasce a
+          partir dessa semente.
         </p>
-        <Link
-          href="/sobre#manifesto"
-          className="font-space-mono lowercase text-sm text-amber-200 underline underline-offset-4 decoration-amber-400/50 hover:text-amber-100 transition-colors"
-        >
-          ler o manifesto →
-        </Link>
       </section>
 
       {/* Accordions */}
-      <section className="border-x border-(--amarelo) bg-amber-200">
-        {principios.map((p) => (
-          <Accordion key={p.id} principio={p} />
-        ))}
+      <section className="bg-amber-200 border-x border-(--amarelo)">
+        <Accordion
+          numero="01"
+          nome="Profundo e Otimista"
+          explainer="Conteúdo escrito com calma e profundidade, otimista sobre a vida e sobre o seu span de atenção."
+        >
+          <RealizacaoCard
+            status="ativa"
+            name="Links Amarelos"
+            cover="/brand/links-amarelos-3.png"
+            cta="Assinar"
+            href="https://amarelodandara.substack.com"
+          >
+            <p className="">
+              A curadoria mensal dos creme de la creme da internet. Artigos,
+              vídeos, músicas, imagens, ferramentas e buracos negros digitais —
+              curados à mão.
+            </p>
+          </RealizacaoCard>
+          <RealizacaoCard
+            status="ativa"
+            name="Ondas Amarelas"
+            cover="/brand/ondas-amarelas-6.png"
+            cta="Ouvir"
+            href="https://open.spotify.com/show/043Gs7eyY2KOlotEWSTSxB?si=e7abf2b9730747d7"
+          >
+            <p className="font-manrope text-sm text-amber-800 leading-relaxed mt-1">
+              A versão em áudio expandida dos links amarelos. O mesmo conteúdo,
+              mas com um tempero a mais que pode morar no rádio do seu carro ou
+              no seu fone de ouvido.
+            </p>
+          </RealizacaoCard>
+          <RealizacaoCard
+            status="construindo"
+            name="Hyperlinks Amarelos"
+            cover="/brand/coming-newsletter.png"
+            cta="Ouvir"
+            href={null}
+          >
+            <p className="font-manrope text-sm text-amber-800 leading-relaxed mt-1">
+              Ensaios sobre assuntos específicos formados por muitos links
+              amarelos demais para caber em uma issue ou outra.
+            </p>
+          </RealizacaoCard>
+        </Accordion>
+
+        <Accordion
+          numero="02"
+          nome="Presente e Multimídia"
+          explainer="Formatos que vão além do texto e realizações que vão além da internet."
+        >
+          <RealizacaoCard status="planejada" name="Hyperlinks Amarelos">
+            <p className="font-manrope text-sm text-amber-800 leading-relaxed mt-1">
+              Quando um link extrapola os limites de uma newsletter, ele ganha
+              um espaço dedicado em forma de ensaio por áudio.
+            </p>
+          </RealizacaoCard>
+        </Accordion>
+
+        <Accordion
+          numero="03"
+          nome="Auto-sustentável e Expansivo"
+          explainer="Projetos que se financiam e crescem com a comunidade que os sustenta."
+        >
+          <RealizacaoCard status="planejada" name="Arquivo Amarelo">
+            <p className="font-manrope text-sm text-amber-800 leading-relaxed mt-1">
+              Todo link já compartilhado em Links Amarelos, organizado,
+              pesquisável e anotado. Um acervo vivo de descobertas.
+            </p>
+          </RealizacaoCard>
+        </Accordion>
+
+        <Accordion
+          numero="04"
+          nome="Apoiado e Apoiador"
+          explainer="Uma rede de apoio mútuo entre criadores e leitores."
+        />
       </section>
 
       {/* Support CTA */}
@@ -243,12 +229,9 @@ export default function RealizacoesPage() {
           financiar novos projetos.
         </p>
         <div className="pt-4">
-          <Link
-            href="/apoio"
-            className="font-space-mono lowercase px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors text-sm"
-          >
+          <Button variant="primary" href="/apoio" className="text-sm">
             ver planos de apoio
-          </Link>
+          </Button>
         </div>
       </section>
     </main>

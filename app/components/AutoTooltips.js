@@ -36,7 +36,6 @@ export default function AutoTooltips() {
   const [activeIdx, setActiveIdx] = useState(null);
   const [displayedUrl, setDisplayedUrl] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const stepRef = useRef(0);
   const seqTimerRef = useRef(null);
@@ -107,15 +106,6 @@ export default function AutoTooltips() {
   const getFullHref = () =>
     lastItemIdxRef.current !== null ? ITEMS[lastItemIdxRef.current].href : "";
 
-  const handleCopy = useCallback(() => {
-    const href = getFullHref();
-    if (!href) return;
-    navigator.clipboard.writeText(href).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
-  }, []);
-
   const handleOpen = useCallback(() => {
     const href = getFullHref();
     if (!href) return;
@@ -157,37 +147,6 @@ export default function AutoTooltips() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
-            onClick={handleCopy}
-            disabled={!displayedUrl}
-            className="transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:scale-125 active:scale-90 cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
-            title="Copiar link"
-          >
-            {copied ? (
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            ) : (
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-            )}
-          </button>
-          <button
             onClick={handleOpen}
             disabled={!displayedUrl}
             className="transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:scale-125 active:scale-90 cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
@@ -200,10 +159,11 @@ export default function AutoTooltips() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15 3 21 3 21 9" />
-              <line x1="10" y1="14" x2="21" y2="3" />
+              <line x1="7" y1="17" x2="17" y2="7" />
+              <polyline points="7 7 17 7 17 17" />
             </svg>
           </button>
         </div>

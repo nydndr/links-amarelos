@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Button from "./Button";
 
 export default function Timeline({ items }) {
   return (
@@ -17,12 +17,9 @@ export default function Timeline({ items }) {
                 {item.desc}
               </p>
               {item.href && (
-                <Link
-                  href={item.href}
-                  className="inline-block font-space-mono text-xs lowercase mt-1 px-3 py-1 border border-black/20 rounded-full text-black/70 hover:bg-black/5 transition-colors"
-                >
+                <Button variant="ghost" href={item.href} className="text-xs mt-1">
                   {item.cta}
-                </Link>
+                </Button>
               )}
             </div>
           </div>
